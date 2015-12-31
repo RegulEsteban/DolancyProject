@@ -1,0 +1,18 @@
+Admin			Asistente		Koinonia		Municipio		Estado
+-----			-----------		----------		-------			-------
+id			id			id			id			id
+nombre			nombres			nombre			nombre			nombre
+ap_pat			ap_pat						id_estado
+ap_mat			ap_mat
+email			edad
+password		email
+status			sexo
+			id_municipio
+			id_koinonia
+
+ALTER TABLE  `koinonia` ADD  `lugares_disponibles` INT( 1 ) NOT NULL AFTER  `nombre` ;
+ALTER TABLE  `koinonia` ADD  `edad_min` INT( 2 ) NOT NULL AFTER  `nombre` ,
+ADD  `edad_max` INT( 2 ) NOT NULL AFTER  `edad_min` ;
+ALTER TABLE  `koinonia` ADD  `tipo` VARCHAR( 1 ) NOT NULL AFTER  `lugares_disponibles`;
+ALTER TABLE  `koinonia` ADD  `status` INT( 1 ) NOT NULL DEFAULT  '0' AFTER  `tipo`;
+ALTER TABLE  `admin` ADD  `tipo` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `password` ;
