@@ -1,10 +1,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
-<meta name="author" content="">
-<link href="images/logoicono.ico" type="image/x-icon" rel="shortcut icon" />
-<meta name="description" content="Encuentro Renovado Catolico Juvenil - E.R.Ca.J. Mexico del 27 al 30 de Diciembre en el Colegio Liceo del Valle, Metepec, México.">
-<meta name="keywords" content="ercaj,ERCAJ,irsjb,ERCaJ,inscripciones ercaj, metepec,mexico">
+<meta name="author" content="dolancy shoes">
+<meta name="description" content="Dolancy es una empresa 100% mexicana dedicada a la producción y comercializazción de calzado, caracterizada por ofrecer alta moda e innovación.">
+<meta name="keywords" content="dolancy, shoes, zapateria, zapato, zapatos, caballero, méxico, san mateo atenco">
 <meta http-equiv="Revisit-After" content="3 days" />
 <meta name="Robots" content="all" />
 <meta name="Distribution" content="Global" />

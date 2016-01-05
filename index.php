@@ -10,18 +10,20 @@
     <?php
         include("menu.php");
     ?>
-    <section id="testimonial" class="alizarin" style="padding: 10px 0 50px 0;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="center">
-                        <h1>¡Falta poco para <a href="ercaj-mexico.php">Dolan</a>!</h1>
-                        <p>Ya queda poco tiempo para dar inicio al próximo ERCaJ México 2014</p><br/>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    
+<!--  	<section id="testimonial" class="alizarin" style="padding: 10px 0 50px 0;"> -->
+<!--         <div class="container"> -->
+<!--             <div class="row"> -->
+<!--                 <div class="col-lg-12"> -->
+<!--                     <div class="center"> -->
+<!--                         <h1>¡Falta poco para <a href="ercaj-mexico.php">Dolan</a>!</h1> -->
+<!--                         <p>Ya queda poco tiempo para dar inicio al próximo ERCaJ México 2014</p><br/> -->
+<!--                     </div> -->
+<!--                 </div> -->
+<!--             </div> -->
+<!--         </div> -->
+<!--     </section> -->
+    
     <section id="main-slider" class="no-margin">
         <div class="carousel slide wet-asphalt">
             <ol class="carousel-indicators">
@@ -30,7 +32,7 @@
                 <li data-target="#main-slider" data-slide-to="2"></li>
             </ol>
             <div class="carousel-inner">
-                <div class="item active" style="background-image: url(images/slider/bg01.jpg)">
+                <div class="item active" style="background-image: url(images/slider/dolancy.png)">
                     <div class="container">
                         <div class="row">
                             <div class="col-sm-12">
@@ -104,14 +106,14 @@
                 <div class="col-md-4 col-sm-6">
                     <div class="media">
                         <div class="pull-left">
-                            <i class="icon-twitter icon-md"></i>
+                            <i class="icon-instagram icon-md"></i>
                         </div>
                         <div class="media-body">
-                            <a href="https://twitter.com/ERCaJ20141" target="_blank">
-                                <h3 class="media-heading">Twitter ERCaJ</h3>
+                            <a href="https://instagram.com/dolancy" target="_blank">
+                                <h3 class="media-heading">Dolancy</h3>
                             </a>
-                            <p>Síguenos en <a href="https://twitter.com/ERCaJ20141" target="_blank">@ERCaJ20141</a></p>
-                            <p>#ERCaJMexico2014</p>
+                            <p>Síguenos en <a href="https://instagram.com/dolancy" target="_blank">@dolancy</a></p>
+                            <p>#DolancyShoes</p>
                         </div>
                     </div>
                 </div><!--/.col-md-4-->
@@ -121,10 +123,10 @@
                             <i class="icon-facebook icon-md"></i>
                         </div>
                         <div class="media-body">
-                            <a href="https://www.facebook.com/ercaj.Argentina" target="_blank">
-                                <h3 class="media-heading">Facebook ERCaJ</h3>
+                            <a href="https://www.facebook.com/dolancy" target="_blank">
+                                <h3 class="media-heading">Facebook Dolancy</h3>
                             </a>
-                            <p><div class="fb-like" data-href="https://www.facebook.com/photo.php?fbid=758616454213404&amp;set=a.364514586956928.83210.100001951696925&amp;type=1&amp;theater" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div></p>
+                            
                         </div>
                     </div>
                 </div><!--/.col-md-4-->
@@ -135,7 +137,7 @@
                         </div>
                         <div class="media-body">
                             <a href="https://www.youtube.com/channel/UCdZqzwJD3o8QMdUs8HdgUEA" target="_blank">
-                                <h3 class="media-heading">YouTube ERCaJ</h3>
+                                <h3 class="media-heading">YouTube Dolancy</h3>
                             </a>
                             <p>Nuestros videos.</p>
                         </div>
@@ -167,12 +169,5 @@
         });
     </script>
     <div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
 </body>
 </html>
