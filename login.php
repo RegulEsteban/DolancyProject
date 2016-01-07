@@ -3,7 +3,7 @@ ob_start();
 include ("funcionesLogin.php");
 if(isLogin())
 {
-    header("Location:paginaInscritos.php");
+    header("Location:Bienvenido");
 }else{
 ?>
 <!DOCTYPE html>
@@ -19,7 +19,7 @@ if(isLogin())
         include("menu.php");
     ?>
 
-    <section id="title" class="midnight-blue">
+    <section id="title">
         <div class="container">
             <div class="row">
                 <div class="col-sm-8">
@@ -34,10 +34,9 @@ if(isLogin())
                 <div class="col-md-8">
                     <h2>Bienvenido</h2><br/>   
                     <?php 
-                        if($_GET)
-                        {
-                            if($_GET["logout"]=="true")
-                            {
+                        if($_GET){
+                        	
+                            if($_GET["access"]=="bye"){
                                 ?>
                                 <br/>
                                 <div class="alert alizarin" role="alert">¡Sesión cerrada!</div>
@@ -57,10 +56,9 @@ if(isLogin())
                         <button type="submit" class="btn btn-warning">Iniciar Sesión</button>
                     </form>
                     <?php 
-                        if($_GET)
-                        {
-                            if($_GET["access"]=="false")
-                            {
+                        if($_GET){
+                        	
+                            if($_GET["access"]=="denegado"){
                                 ?>
                                 <br/>
                                 <div class="alert alizarin" role="alert">Usuario o Contraseña incorrectos.</div>

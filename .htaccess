@@ -4,5 +4,7 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 #secciones generales
-RewriteRule ^Admin ./login.php
+RewriteRule ^admin/?$ ./login.php
 RewriteRule ^./$ ./index.php
+RewriteRule ^admin-(\w+)/?$ login.php?access=$1
+RewriteRule ^Bienvenido/?$ ./principal.php

@@ -1,4 +1,4 @@
-<header class="navbar navbar-inverse navbar-fixed-top midnight-blue" role="banner">
+<header class="navbar navbar-inverse navbar-fixed-top" role="banner">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -32,7 +32,7 @@
                 </li>
                 <li><a href="portfolio.php"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span> Fotos</a></li>
                 <li><a href="contact-us.html"><span class="glyphicon glyphicon-earphone" aria-hidden="true"></span> Contacto</a></li>
-                <li><a href="Admin"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Admin</a></li>
+                <li><a href="admin"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Admin</a></li>
             </ul>
         </div>
     </div>

@@ -2,7 +2,7 @@
 @session_start();
 function isLogin()
 {
-	if($_SESSION["pagInscripcionesErcaj"]==true)
+	if($_SESSION["dolancySession"]==true)
 	{
 		return true;
 	}else{
@@ -12,7 +12,7 @@ function isLogin()
 
 function esAdministrador()
 {
-	if($_SESSION["pagInscripcionesErcaj"])
+	if($_SESSION["dolancySession"])
 		if($_SESSION["type"]=="Administrador")
 			return true;
 		else
@@ -24,7 +24,7 @@ function esAdministrador()
 function esSuper()
 {
 	
-	if($_SESSION["on"])
+	if($_SESSION["dolancySession"])
 	{
 		if($_SESSION["type"]=="Super Administrador")
 			return true;
