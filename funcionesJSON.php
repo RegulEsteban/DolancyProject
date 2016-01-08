@@ -5,6 +5,29 @@ include './funciones.php';
 if($_POST)
 {
     include_once './conf/query.inc';
+    if($_POST["model"] && $_POST["color"] && $_POST["size"]){
+    	$modelid = $_POST["model"];
+    	$colorid = $_POST["color"];
+    	$sizeid = $_POST["size"];
+    	$query = new query();
+    	$stocks = $query->select("shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address",
+    					"from detail_stock s
+						join shoe on s.shoeid = shoe.shoeid
+						join model m on m.modelid = shoe.modelid
+						join sizes z on z.sizesid = shoe.sizesid
+						join color c on c.colorid = shoe.colorid
+						join branch b on b.branchid = s.branchid",
+    					"where m.modelid = $modelid and z.sizesid = $sizeid and c.colorid = $colorid ", "", "obj");
+    	
+    	if(count($stocks)>0){
+    		foreach ($stocks as $stock){
+    			
+    		}
+    	}else{
+    		echo json_encode("null");
+    	}
+    }
+    
     if($_POST["id_estado"])
     {
         $id_estado=$_POST["id_estado"];

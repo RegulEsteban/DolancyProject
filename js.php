@@ -2,6 +2,8 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.prettyPhoto.js"></script>
 <script src="js/main.js"></script>
+<script src="js/funciones.js"></script>
+<script src="js/reloj.js"></script>
 <script src="dataTable/js/jquery.dataTables.js" ></script>
 <script src="dataTable/js/jquery.dataTables.min.js" ></script>
 <script type="text/javascript" language="javascript" class="init">
@@ -34,5 +36,4 @@
         });
     });
 </script>
-<script src="js/funciones.js"></script>
 <script src="js/funciones.koinonia.js"></script>

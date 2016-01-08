@@ -34,7 +34,7 @@ function consultaEstados() {
 }
 
 function letras($param) {
-    $namefields = "/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\-\s]+$/";
+    $namefields = "/^[a-zA-Zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\-\s]+$/";
     if (preg_match($namefields, $param))
         return false;
     else
@@ -50,7 +50,7 @@ function numeros($param) {
 }
 
 function numerosLestras($param) {
-    $namefields = "/^[a-zA-Z0-9áéíóúñÁÉÍÓÚÑ\-\s]+$/";
+    $namefields = "/^[a-zA-Z0-9ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\-\s]+$/";
     if (preg_match($namefields, $param))
         return false;
     else
@@ -100,6 +100,119 @@ function codificaMail($email="")
 	return $mailCodificado;
 }
 
+
+function getColors(){
+	$query=new Query();
+	$values = $query->select("colorid, title","color","view_type = 1","","obj");
+	if(count($values)>0){
+		echo "<select id='color_select' name='color_select' class='form-control'>";
+		echo "<option value='0' selected>Seleccione un color</option>";
+		foreach ($values as $color){
+			echo "<option value='".$color->colorid."'>".$color->title."</option>";
+		}
+		echo "</select>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>No hay colores por mostrar.</div>";
+	}
+	
+}
+
+function getSizes(){
+	$query=new Query();
+	$values = $query->select("sizesid, size","sizes","1=1","","obj");
+	if(count($values)>0){
+		echo "<select id='size_select' name='size_select' class='form-control'>";
+		echo "<option value='0' selected>Seleccione una talla</option>";
+		foreach ($values as $size){
+			echo "<option value='".$size->sizeid."' >".$size->size."</option>";
+		}
+		echo "</select>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>No hay tallas por mostrar.</div>";
+	}
+}
+
+function getModels(){
+	$query=new Query();
+	$values = $query->select("modelid, title","model","view_type = 1","","obj");
+	if(count($values)>0){
+		echo "<select id='model_select' name='model_select' class='form-control'>";
+		echo "<option value='0' selected>Seleccione un modelo</option>";
+		foreach ($values as $model){
+			echo "<option value='".$model->modelid."'>".$model->title."</option>";
+		}
+		echo "</select>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>No hay modelos por mostrar.</div>";
+	}
+}
+
+function getEmployee($employeeid){
+	$query=new Query();
+	$values = $query->select("firstname, lastname, matname, email, phone, address, type_employee","employee","employeeid = $employeeid ","","obj");
+	
+	if(count($values)==1){
+		echo "<div class='media'><div class='pull-left'><i class='icon-user icon-md'></i></div>
+              <div class='media-body'>";
+                            	
+		foreach ($values as $em){
+			echo "<h4 class='media-heading'>".utf8_encode($em->firstname.' '.$em->lastname.' '.$em->matname)."</h4>
+				<i class='icon-home icon-small'></i> DirecciÃ³n: ".utf8_encode($em->address)."<br/>
+				<i class='icon-phone icon-small'></i> TelÃ©fono: ".$em->phone."<br/>
+				<i class='icon-envelope icon-small'></i> Email: ".$em->email."<br/>";
+		}
+		echo "</div></div>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>Error al consultar empleado.</div>";
+	}
+}
+
+function getSaleList($employeeid){
+	$query = new Query();
+	$ventas = $query->select("saleid, employeeid, client_opid, total", "sale", "employeeid = $employeeid", "and status=0", "obj");
+	if(count($ventas)>0){
+		foreach ($ventas as $venta){
+			echo "<div class='panel-heading'><h4>Listas de Venta</h4><hr><a target='_self' href='#' class='btn btn-primary pull-right'><i class='icon-plus icon-small'></i></a><ul class='nav nav-pills'>";
+			echo "<li class='' ><a href='#tab-$venta->saleid$venta->employeeid' data-toggle='tab'>Lista-$venta->saleid$venta->employeeid</a></li>";
+			echo "</ul></div>";
+			echo "<div class='panel-body'><div class='tab-content'>";
+			echo "<div class='tab-pane fade' id='tab-$venta->saleid$venta->employeeid'>";
+			$stocks = $query->select("shoe.price, m.title as model, c.title as color, z.size as size ",
+									"detail_sale ds
+									join detail_stock s on ds.stockid = s.stockid
+									join shoe on s.shoeid = shoe.shoeid
+									join model m on m.modelid = shoe.modelid
+									join sizes z on z.sizesid = shoe.sizesid
+									join color c on c.colorid = shoe.colorid",
+									"ds.saleid = $venta->saleid ", "", "obj");
+			if(count($stocks)>0){
+				echo '<table id="example" class="display table table-striped" cellspacing="0" width="100%">
+                    	<thead>
+                        	<tr>
+                            	<th>Modelo</th>
+                            	<th>Talla</th>
+                            	<th>Color</th>
+                            	<th>Precio</th>
+                            	<th>AcciÃ³n</th>
+                        	</tr>
+                    	</thead>
+        				<tbody>';
+				foreach ($stocks as $stock){
+					echo '<tr>
+                  			<td>'.$stock->model.'</td>
+                  			<td>'.$stock->size.'</td>
+                  			<td>'.$stock->color.'</td>
+                  			<td>'.$stock->price.'</td>
+                  			<td><a href="#"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td>
+						</tr>';
+				}
+				echo '</tbody></table>';
+			}
+			echo"</div></div></div>";
+		}
+	}
+}
+
 function editaDatos($tabla,$donde)
 {
 	include_once ("Query.inc");
@@ -141,7 +254,7 @@ function editaDatos($tabla,$donde)
 		    </div>
 		  </div>
 		  <div class='form-group'>
-		    <label class='col-sm-2 control-label'>Teléfono:</label>
+		    <label class='col-sm-2 control-label'>Telï¿½fono:</label>
 		    <div class='col-sm-10'>
 		      <input type='text' name='telefono' class='form-control' value=".$valor->telefono." maxlength='10' required>
 		    </div>
@@ -262,7 +375,7 @@ function guardaArchivo($carpeta,$titulo)
 
 function envioCorreoEfectivo($nombre,$email)
 {
-	$titulo = "Pre-Inscripción E.R.Ca.J. M&eacute;xico 2012";
+	$titulo = "Pre-Inscripciï¿½n E.R.Ca.J. M&eacute;xico 2012";
 	$mensaje = "
 <br><div><div dir='ltr'><div><div dir='ltr'><div><table border='0' cellpadding='40' cellspacing='0' width='98%'><tbody><tr><td style='font-family:lucida grande,tahoma,verdana,arial,sans-serif' bgcolor='#f7f7f7' width='100%'><table border='0' cellpadding='0' cellspacing='0' width='620'><tbody><tr><td style='background:#F2F2F2;color:#3b5998;font-weight:bold;font-family:lucida grande,tahoma,verdana,arial,sans-serif;border-left:1px solid #3b5998;border-right:1px solid #3b5998;border-top:1px solid #3b5998;border-bottom:#2D2D2D solid 8px;vertical-align:middle;padding:10px 40px;font-size:24px;letter-spacing:2px;text-align:left'>
 <a href='http://www.ercaj.org/inscripcionesercaj.php' style='color:#3b5998;text-decoration:none' target='_blank'>
@@ -291,7 +404,7 @@ Acudir a la siguiente direcci&oacute;n para realizar el pago en efectivo a:
 Chocolateria Samper's
 <br>
 <span style='color:#333333'>
-Paseo Colón No. 304 Enfrente de la Casa del Gobernador<br/>
+Paseo Colï¿½n No. 304 Enfrente de la Casa del Gobernador<br/>
 Toluca, Estado de M&eacute;xico.
 </span>
 </li>
@@ -341,22 +454,22 @@ Ir al Sitio Oficial del E.R.Ca.J.
 <img src='http://www.ercaj.org/imagenes/logo.jpg' style='border:0;width;140px;height:140px'>
 </span></a></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr>
 <td colspan='2' style='color:#999999;padding:10px;font-size:12px;font-family:lucida grande,tahoma,verdana,arial,sans-serif;padding:10px;border-top:0px solid #3b5998;border-bottom:#2D2D2D solid 2px'>
-El mensaje se envió a $email. Dudas o Aclaraciones contactanos: ercajmexico@hotmail.com
+El mensaje se enviï¿½ a $email. Dudas o Aclaraciones contactanos: ercajmexico@hotmail.com
 http://www.ercaj.org
-Encuentro Renovado Católico Juvenil.
+Encuentro Renovado Catï¿½lico Juvenil.
 </td></tr></tbody></table></td></tr></tbody></table></div></div></div> </div></div>
 	";
 
 	$headers  = "MIME-Version: 1.0\r\n";
 	$headers .= "Content-type: text/html; charset=utf-8\n";
-	$headers .= "From: Pre-Inscipciones E.R.Ca.J. México 2012 <contacto@ercaj.org>";
+	$headers .= "From: Pre-Inscipciones E.R.Ca.J. Mï¿½xico 2012 <contacto@ercaj.org>";
 	echo $email;
 	mail($email,$titulo,$mensaje,$cabeceras) or die ("Su mensaje no se envio.");
 }
 
 function envioCorreoTransferencia($nombre,$email)
 {
-	$titulo = "Pre-Inscripción E.R.Ca.J. M&eacute;xico 2012";
+	$titulo = "Pre-Inscripciï¿½n E.R.Ca.J. M&eacute;xico 2012";
 	$mensaje = "
 <br><div><div dir='ltr'><div><div dir='ltr'><div><table border='0' cellpadding='40' cellspacing='0' width='98%'><tbody><tr><td style='font-family:lucida grande,tahoma,verdana,arial,sans-serif' bgcolor='#f7f7f7' width='100%'><table border='0' cellpadding='0' cellspacing='0' width='620'><tbody><tr><td style='background:#F2F2F2;color:#3b5998;font-weight:bold;font-family:lucida grande,tahoma,verdana,arial,sans-serif;border-left:1px solid #3b5998;border-right:1px solid #3b5998;border-top:1px solid #3b5998;border-bottom:#2D2D2D solid 8px;vertical-align:middle;padding:10px 40px;font-size:24px;letter-spacing:2px;text-align:left'>
 <a href='http://www.ercaj.org/inscripcionesercaj.php' style='color:#3b5998;text-decoration:none' target='_blank'>
@@ -437,21 +550,21 @@ Ir al Sitio Oficial del E.R.Ca.J.
 <img src='http://www.ercaj.org/imagenes/logo.jpg' style='border:0;width;140px;height:140px'>
 </span></a></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr>
 <td colspan='2' style='color:#999999;padding:10px;font-size:12px;font-family:lucida grande,tahoma,verdana,arial,sans-serif;padding:10px;border-top:0px solid #3b5998;border-bottom:#2D2D2D solid 2px'>
-El mensaje se envió a $email. Dudas o Aclaraciones contactanos: ercajmexico@hotmail.com
+El mensaje se enviï¿½ a $email. Dudas o Aclaraciones contactanos: ercajmexico@hotmail.com
 http://www.ercaj.org
-Encuentro Renovado Católico Juvenil.
+Encuentro Renovado Catï¿½lico Juvenil.
 </td></tr></tbody></table></td></tr></tbody></table></div></div></div> </div></div>";
 
 	$headers  = "MIME-Version: 1.0\r\n";
 	$headers .= "Content-type: text/html; charset=utf-8\n";
-	$headers .= "From: Pre-Inscipciones E.R.Ca.J. México 2012 <contacto@ercaj.org>";
+	$headers .= "From: Pre-Inscipciones E.R.Ca.J. Mï¿½xico 2012 <contacto@ercaj.org>";
 	
 	mail($email,$titulo,$mensaje,$cabeceras) or die ("Su mensaje no se envio.");
 }
 
 function envioCorreoDeposito($nombre,$email)
 {
-	$titulo = "Pre-Inscripción E.R.Ca.J. M&eacute;xico 2012";
+	$titulo = "Pre-Inscripciï¿½n E.R.Ca.J. M&eacute;xico 2012";
 	$mensaje = "
 <br><div><div dir='ltr'><div><div dir='ltr'><div><table border='0' cellpadding='40' cellspacing='0' width='98%'><tbody><tr><td style='font-family:lucida grande,tahoma,verdana,arial,sans-serif' bgcolor='#f7f7f7' width='100%'><table border='0' cellpadding='0' cellspacing='0' width='620'><tbody><tr><td style='background:#F2F2F2;color:#3b5998;font-weight:bold;font-family:lucida grande,tahoma,verdana,arial,sans-serif;border-left:1px solid #3b5998;border-right:1px solid #3b5998;border-top:1px solid #3b5998;border-bottom:#2D2D2D solid 8px;vertical-align:middle;padding:10px 40px;font-size:24px;letter-spacing:2px;text-align:left'>
 <a href='http://www.ercaj.org/inscripcionesercaj.php' style='color:#3b5998;text-decoration:none' target='_blank'>
@@ -531,15 +644,15 @@ Ir al Sitio Oficial del E.R.Ca.J.
 <img src='http://www.ercaj.org/imagenes/logo.jpg' style='border:0;width;140px;height:140px'>
 </span></a></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr>
 <td colspan='2' style='color:#999999;padding:10px;font-size:12px;font-family:lucida grande,tahoma,verdana,arial,sans-serif;padding:10px;border-top:0px solid #3b5998;border-bottom:#2D2D2D solid 2px'>
-El mensaje se envió a $email. Dudas o Aclaraciones contactanos: ercajmexico@hotmail.com
+El mensaje se enviï¿½ a $email. Dudas o Aclaraciones contactanos: ercajmexico@hotmail.com
 http://www.ercaj.org
-Encuentro Renovado Católico Juvenil.
+Encuentro Renovado Catï¿½lico Juvenil.
 </td></tr></tbody></table></td></tr></tbody></table></div></div></div> </div></div>
 	";
 
 	$headers  = "MIME-Version: 1.0\r\n";
 	$headers .= "Content-type: text/html; charset=utf-8\n";
-	$headers .= "From: Pre-Inscipciones E.R.Ca.J. México 2012 <contacto@ercaj.org>";
+	$headers .= "From: Pre-Inscipciones E.R.Ca.J. Mï¿½xico 2012 <contacto@ercaj.org>";
 	
 	mail($email,$titulo,$mensaje,$cabeceras) or die ("Su mensaje no se envio.");
 }
@@ -610,7 +723,7 @@ function insertaRegistro()
 						  "'$nombre','$ap_pat','$ap_mat','$telefono_casa','$idMunicipio','$edad','$email','$sexo','$idKoinonia'"))
 		{
 			if(!$query->update("koinonia","lugares_disponibles=(lugares_disponibles-1)","id=$idKoinonia")){
-				echo "<p>Error al asignar Koinonía</p>";
+				echo "<p>Error al asignar Koinonï¿½a</p>";
 			}				
 				echo"<h2>Datos insertados correctamente</h2>
 				<br/>
@@ -658,7 +771,7 @@ function consultaKoinonias()
         echo '</tbody>
         </table></div>';
     }else{
-    	echo "<div class='alert wet-asphalt' role='alert'>No se encontraron Koinonías.</div>";
+    	echo "<div class='alert wet-asphalt' role='alert'>No se encontraron Koinonï¿½as.</div>";
     }
 }
 

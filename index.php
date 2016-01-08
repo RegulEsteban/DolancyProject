@@ -157,17 +157,6 @@
     <script src="js/main.js"></script>
     <script src="js/jquery.countdown.js"></script>
 
-    <script type="text/javascript">
-        $("#getting-started")
-        .countdown("2014/12/27", function(event) {
-          $(this).html(
-            event.strftime('<h1 style="font-size: 4.0em;"><div class="col-xs-12 col-sm-3"><code>%D</code> días </div>'
-         + '<div class="col-xs-12 col-sm-3"><code>%H</code> horas </div>'
-         + '<div class="col-xs-12 col-sm-3"><code>%M</code>minutos </div>'
-         + '<div class="col-xs-12 col-sm-3"><code>%S</code>segundos</div></h1>')
-          );
-        });
-    </script>
     <div id="fb-root"></div>
 </body>
 </html>
