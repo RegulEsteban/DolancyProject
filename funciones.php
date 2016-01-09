@@ -124,7 +124,7 @@ function getSizes(){
 		echo "<select id='size_select' name='size_select' class='form-control'>";
 		echo "<option value='0' selected>Seleccione una talla</option>";
 		foreach ($values as $size){
-			echo "<option value='".$size->sizeid."' >".$size->size."</option>";
+			echo "<option value='".$size->sizesid."' >".$size->size."</option>";
 		}
 		echo "</select>";
 	}else{
@@ -171,12 +171,8 @@ function getSaleList($employeeid){
 	$query = new Query();
 	$ventas = $query->select("saleid, employeeid, client_opid, total", "sale", "employeeid = $employeeid", "and status=0", "obj");
 	if(count($ventas)>0){
+		echo "<div class='panel-heading'>Listas de Venta</div><div class='panel-body'>";
 		foreach ($ventas as $venta){
-			echo "<div class='panel-heading'><h4>Listas de Venta</h4><hr><a target='_self' href='#' class='btn btn-primary pull-right'><i class='icon-plus icon-small'></i></a><ul class='nav nav-pills'>";
-			echo "<li class='' ><a href='#tab-$venta->saleid$venta->employeeid' data-toggle='tab'>Lista-$venta->saleid$venta->employeeid</a></li>";
-			echo "</ul></div>";
-			echo "<div class='panel-body'><div class='tab-content'>";
-			echo "<div class='tab-pane fade' id='tab-$venta->saleid$venta->employeeid'>";
 			$stocks = $query->select("shoe.price, m.title as model, c.title as color, z.size as size ",
 									"detail_sale ds
 									join detail_stock s on ds.stockid = s.stockid
@@ -186,7 +182,7 @@ function getSaleList($employeeid){
 									join color c on c.colorid = shoe.colorid",
 									"ds.saleid = $venta->saleid ", "", "obj");
 			if(count($stocks)>0){
-				echo '<table id="example" class="display table table-striped" cellspacing="0" width="100%">
+				echo '<table id="idTableSaleList" saleid="'.$venta->saleid.'" class="table table-striped">
                     	<thead>
                         	<tr>
                             	<th>Modelo</th>
@@ -208,8 +204,44 @@ function getSaleList($employeeid){
 				}
 				echo '</tbody></table>';
 			}
-			echo"</div></div></div>";
 		}
+		echo"</div>";
+	}
+}
+
+function getShoes($branchid){
+	$query = new Query();
+	$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address",
+			"detail_stock s
+			join shoe on s.shoeid = shoe.shoeid
+			join model m on m.modelid = shoe.modelid
+			join sizes z on z.sizesid = shoe.sizesid
+			join color c on c.colorid = shoe.colorid
+			join branch b on b.branchid = s.branchid",
+			"b.branchid = $branchid order by s.shoeid","", "obj");
+	 
+	if(count($stocks)>0){
+		echo "<table class='table table-striped'><thead><tr>
+				<th>Modelo</th>
+				<th>Talla</th>
+				<th>Color</th>
+				<th>Precio</th>
+				<th>Sucursal</th>
+				<th>Agregar</th>
+				</tr></thead><tbody>";
+		foreach ($stocks as $stock){
+			echo '<tr>
+                  	<td>'.$stock->model.'</td>
+                  	<td>'.$stock->size.'</td>
+                  	<td>'.$stock->color.'</td>
+                  	<td>'.$stock->price.'</td>
+                  	<td><code>'.$stock->branch_name.'</code> <i class="icon-home icon-small"></i> '.$stock->branch_address.'</td>
+					<td><a href="#" class="addShoeList" stockid='.$stock->id.'><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>
+				</tr>';
+		}
+		echo "</tbody></table>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>";
 	}
 }
 

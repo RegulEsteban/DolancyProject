@@ -38,6 +38,14 @@ function getUsuId(){
 	}
 }
 
+function getBranchId(){
+	if($_SESSION["dolancySession"]){
+		return $_SESSION["branchid"];
+	}else{
+		return 0;
+	}
+}
+
 function toggleLogin()
 {
 	if(isLogin()) {

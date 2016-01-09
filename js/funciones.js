@@ -1,4 +1,4 @@
-$(document).ready(function()
+$(function()
 {
 	var color_select = document.getElementById("color_select");
 	var size_select = document.getElementById("size_select");
@@ -140,21 +140,50 @@ $(document).ready(function()
 //			}
 //        }
 //    }
+	
+	$(".addShoeList").click(function(event){
+//		alert($(".addShoeList").attr("stockid"));
+//		$("#modalTitle").html("Agregar producto a lista de venta");
+//		$('#myModal').modal('show');
+		var stockid = $(event.target).attr("stockid");
+		var saleid = $("#idTableSaleList").attr("saleid");
+		
+		$.post("funcionesJSON.php", {stockid: stockid, saleid: saleid}, function(respuesta){
+
+			if(respuesta === "null"){
+				$("#search_shoe_result").html("<div class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>");
+			}else{
+				$('#idTableSaleList tbody').append('<tr><td>'+respuesta.model+
+						'</td><td>'+respuesta.size+
+						'</td><td>'+respuesta.color+
+						'</td><td>'+respuesta.price+
+						'</td><td><a href="#"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td></tr>');
+			}
+		}, 'json');
+		
+	});
 
     $("#search_shoe").click(function(event){
     	
     	$.post("funcionesJSON.php", {model: model_select.value, color: color_select.value, size: size_select.value}, function(respuesta) {
-    		alert("dd");
+
     		if (respuesta === "null")
     		{
-    			search_shoe_result.innerHTML = "<div class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>";
+    			$("#search_shoe_result").html("<div class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>");
     		} else {
-    			search_shoe_result.innerHTML = "<table id='example' class='display table table-striped' cellspacing='0' width='100%'><thead><tr>"+
+    			$("#search_shoe_result").html("<table class='table table-striped'><thead><tr>"+
                             	"<th>Modelo</th>"+
                             	"<th>Talla</th>"+
                             	"<th>Color</th>"+
                             	"<th>Precio</th>"+
-                            	"<th>Acción</th></tr></thead><tbody>"+respuesta.respuesta+"</tbody></table>";
+                            	"<th>Sucursal</th>"+
+                            	"<th>Agregar</th>"+
+                            	"</tr></thead><tbody>"+respuesta+"</tbody></table>");
+    			
+    			$(".addShoeList").click(function(){
+//    				alert($(".addShoeList").attr("stockid"));
+    				$('#myModal').modal('show');
+    			});
     		}
       },'json');
     });

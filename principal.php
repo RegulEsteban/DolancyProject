@@ -67,7 +67,11 @@ if(!isLogin()){
     		<div class="col-xs-6">
 	    		<div class="panel panel-warning">
     				<div class="panel-heading">Resultados de Búsqueda</div>
-    				<div id="search_shoe_result" class="panel-body"></div>
+    				<div id="search_shoe_result" class="panel-body">
+    					<?php 
+    					getShoes(getBranchId()) 
+    					?>
+    				</div>
   				</div>
     		</div>
     		<div class="col-xs-6">
@@ -81,8 +85,26 @@ if(!isLogin()){
     <?php include("footer.php"); ?>
 
     <?php include("js.php"); ?>
-    
-
+	
+	<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  		<div class="modal-dialog" role="document">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        			<h4 class="modal-title" id="modalTitle">Modal title</h4>
+      			</div>
+      			<div class="modal-body">
+        			...
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        			<button type="button" class="btn btn-primary">Save changes</button>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+	
 </body>
 </html>
 <?php

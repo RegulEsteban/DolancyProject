@@ -35,10 +35,12 @@ function iniciaSession(){
 								session_start();
 								$_SESSION["dolancySession"]=true;
 								foreach ($em as $u) :
+								$branchid=$query->select("branchid","branch","employeeid = $u->employeeid","","arr");
 								$_SESSION["nombre"]=$u->firstname." ".$u->lastname;
 								$_SESSION["email"]=$u->email;
 								$_SESSION["employeeid"]=$u->employeeid;
 								$_SESSION["type_usu"]=$u->type_employee;
+								$_SESSION["branchid"]=$branchid[0];
 								endforeach;
 								header("Location:Bienvenido");
 							}else{
