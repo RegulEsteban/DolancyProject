@@ -5,12 +5,12 @@ include './funciones.php';
 if($_POST)
 {
     include_once './conf/query.inc';
-    
+    //buscar zapato por atributos
     if($_POST["model"]!=null && $_POST["color"]!=null && $_POST["size"]!=null){
     	$modelid = $_POST["model"];
     	$colorid = $_POST["color"];
     	$sizeid = $_POST["size"];
-    	$sentencia = "1=1 ";
+    	$sentencia = "s.status = 0 or s.status = 1 or s.status = 3 ";
     	
     	if($modelid!=0){
     		$sentencia=$sentencia."and m.modelid = $modelid ";
@@ -23,7 +23,7 @@ if($_POST)
     	}
     	
     	$query = new query();
-    	$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address",
+    	$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address, s.status",
     					"detail_stock s
 						join shoe on s.shoeid = shoe.shoeid
 						join model m on m.modelid = shoe.modelid
@@ -35,44 +35,115 @@ if($_POST)
     	if(count($stocks)>0){
     		$result = "";
     		foreach ($stocks as $stock){
-    			$result=$restult.'<tr>
+    			$result=$result.'<tr>
                   		<td>'.$stock->model.'</td>
                   		<td>'.$stock->size.'</td>
                   		<td>'.$stock->color.'</td>
                   		<td>'.$stock->price.'</td>
-                  		<td><code>'.$stock->branch_name.'</code> <i class="icon-home icon-small"></i> '.$stock->branch_address.'</td>
-						<td><a href="#" class="addShoeList" stockid="'.$stock->id.'"><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>
-					</tr>';
+                  		<td><code>'.$stock->branch_name.'</code> <i class="icon-home icon-small"></i> '.$stock->branch_address.'</td>';
+    			if($stock->status==1){
+    				$result=$result.'<td><i class="icon-frown icon-small"></i> No disponible</td>';
+    			}else{
+    				$result=$result.'<td><a href="#" class="addShoeList" stockid='.$stock->id.'><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>';
+    			}
+    			$result=$result.'</tr>';
     		}
     		echo json_encode($result);
     	}else{
     		echo json_encode("null");
     	}
-    }else if($_POST["stockid"]!=null && $_POST["saleid"]!=null){
+    }else if($_POST["addShoe"]){
     	$stockid = $_POST["stockid"];
     	$saleid = $_POST["saleid"];
+
     	$query = new Query();
-    	if(true){ //$query->insert("detail_sale", "saleid,stockid","$saleid,$stockid","")
-    		$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size",
-    				"detail_stock s
-					join shoe on s.shoeid = shoe.shoeid
-					join model m on m.modelid = shoe.modelid
-					join sizes z on z.sizesid = shoe.sizesid
-					join color c on c.colorid = shoe.colorid",
-    				"s.stockid = $stockid ","", "obj");
+    	
+    	include_once './funcionesLogin.php';
+    	$employeeid = getUsuId();
+    	if(getUsuId()!=0){
+    		if($saleid==0){
+				if($query->insert("sale", "employeeid, total", "$employeeid, 0.0")){
+					$ventas = $query->select("saleid", "sale", "employeeid = $employeeid", "and status=0", "obj");
+					if(count($ventas)==1){
+						foreach ($ventas as $venta){
+							if($query->insert("detail_sale", "saleid,stockid","$venta->saleid,$stockid","") && $query->update("detail_stock", "status = 1","stockid = $stockid")){
+								$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size",
+										"detail_stock s
+											join shoe on s.shoeid = shoe.shoeid
+											join model m on m.modelid = shoe.modelid
+											join sizes z on z.sizesid = shoe.sizesid
+											join color c on c.colorid = shoe.colorid",
+										"s.stockid = $stockid ","", "obj");
+							
+								if(count($stocks)==1){
+									foreach ($stocks as $stock){
+										$miArray = array("error"=>null,"model"=>$stock->model,"color"=>$stock->color,"size"=>$stock->size,"price"=>$stock->price,"saleid"=>$venta->saleid,"stockid"=>$stock->id);
+										echo json_encode($miArray);
+									}
+								}else{
+									$miArray = array("error"=>"Error al consultar existencia. Favor de solicitar al administrador.");
+									echo json_encode($miArray);
+								}
+							}else{
+								$miArray = array("error"=>"Error al agregar a la lista de venta. Favor de solicitar al administrador.");
+								echo json_encode($miArray);
+							}
+						}
+					}else{
+						$miArray = array("error"=>"Error al insertar venta incompleta. Favor de solicitar al administrador.");
+						echo json_encode($miArray);
+					}
+				}else{
+					$miArray = array("error"=>"Error al insertar venta incompleta. Favor de solicitar al administrador.");
+					echo json_encode($miArray);
+				}
+    		}else{
+    		    if($query->insert("detail_sale", "saleid,stockid","$saleid,$stockid","") && $query->update("detail_stock", "status = 1","stockid = $stockid")){
+    				$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size",
+						    				"detail_stock s
+											join shoe on s.shoeid = shoe.shoeid
+											join model m on m.modelid = shoe.modelid
+											join sizes z on z.sizesid = shoe.sizesid
+											join color c on c.colorid = shoe.colorid",
+						    				"s.stockid = $stockid ","", "obj");
     		
-    		if(count($stocks)==1){
-    			foreach ($stocks as $stock){
-    				$miArray = array("model"=>$stock->model,"color"=>$stock->color,"size"=>$stock->size,"price"=>$stock->price);
-    				echo json_encode($miArray);
-    			}
-			}else{
-				
-			}
+		    		if(count($stocks)==1){
+		    			foreach ($stocks as $stock){
+		    				$miArray = array("error"=>null,"model"=>$stock->model,"color"=>$stock->color,"size"=>$stock->size,"price"=>$stock->price,"saleid"=>$saleid,"stockid"=>$stock->id);
+		    				echo json_encode($miArray);
+		    			}
+					}else{
+						$miArray = array("error"=>"Error al consultar existencia. Favor de solicitar al administrador.");
+						echo json_encode($miArray);
+					}
+		    	}else{
+		    		$miArray = array("error"=>"Error al agregar a la lista de venta. Favor de solicitar al administrador.");
+		    		echo json_encode($miArray);
+		    	}
+    		}
     	}else{
-    		echo json_encode("null");
+    		$miArray = array("error"=>"No hay usuario firmado");
+			echo json_encode($miArray);
     	}
     	
+    }else if($_POST["removeShoe"]){
+    	$stockid = $_POST["stockid"];
+    	$saleid = $_POST["saleid"];
+    	
+    	$query = new Query();
+    	
+    	if($saleid!=0){
+    		if($query->remove("detail_sale", "saleid = $saleid","and stockid = $stockid") && $query->update("detail_stock", "status = 0","stockid = $stockid")){
+    			$miArray = array("error"=>null);
+    			echo json_encode($miArray);
+    		}else{
+    			$miArray = array("error"=>"No se pudo eliminar de la lista de venta.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"No hay venta seleccionada. Favor de solicitar al administrador.");
+    		echo json_encode($miArray);
+    	}
     }
     
 //     if($_POST["id_estado"])

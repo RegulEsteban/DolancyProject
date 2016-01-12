@@ -68,7 +68,14 @@ class query {
         //return ($this-> idQuery) ?mysql_insert_id ():0;
         return mysql_insert_id();
     }
-
+	
+	function remove($tabla, $condicion, $adicionales = "") {
+        if ($this->idConexion && !empty($tabla)) {
+            $sql = "delete from $tabla where $condicion $adicionales";
+            mysql_query($sql) or die("ERROR" . mysql_error());
+            return true;
+        }
+    }
 }
 ?>
 

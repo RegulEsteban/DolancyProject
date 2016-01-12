@@ -5204,6 +5204,10 @@ button.close {
 	-webkit-appearance: none
 }
 
+button.pull-right {
+	margin-left: 10px;
+}
+
 .modal-open {
 	overflow: hidden
 }

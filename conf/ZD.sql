@@ -14,3 +14,7 @@ join sizes z on z.sizesid = shoe.sizesid
 join color c on c.colorid = shoe.colorid
 join branch b on b.branchid = s.branchid
 where m.modelid = 1 and z.sizesid = 1 and c.colorid = 1;
+
+select * from employee e
+join branch b on b.employeeid = e.employeeid
+where e.employeeid = 1;

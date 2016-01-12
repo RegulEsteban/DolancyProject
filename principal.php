@@ -43,24 +43,18 @@ if(!isLogin()){
     		<div class="col-xs-4">
 	    		<div class="panel panel-warning">
 	  				<div class="panel-body">
-	    				<p>Buscar usando un código QR</p>
-	    				<a target="_self" href="#" class="btn btn-success btn-lg"><i class="icon-qrcode icon-small"></i> Escanear QR</a>
-						<hr>
 						<p>Ver lista de ventas de hoy</p>
-	    				<a target="_self" href="#" class="btn btn-warning btn-lg"><i class="icon-list icon-small"></i> Ventas de hoy</a>
+	    				<a target="_self" href="#" class="btn btn-primary btn-lg"><i class="icon-list icon-small"></i> Lista de hoy</a>
 	  				</div>
 				</div>
     		</div>
     		<div class="col-xs-4">
-	    		<div class="panel panel-success">
+	    		<div class="panel panel-default">
 	  				<div class="panel-heading">
 						<?php getEmployee(getUsuId())?>
-						<hr>
-						<div class="media services"><div class="pull-left"><i class="icon-time icon-md"></i></div>
-              				<div class="media-body" id="liveclock"></div>
-              			</div>
 	  				</div>
 				</div>
+				<div id="liveclock" style="background:#34495E;color:#fff;border-radius:10px;padding:5px 10px 5px 25px;" class="block"></div>
     		</div>
     	</div>
     	<div class="row">
@@ -76,34 +70,81 @@ if(!isLogin()){
     		</div>
     		<div class="col-xs-6">
     			<div class="panel panel-warning">
-    				<?php getSaleList(getUsuId())?>
+    				<div class='panel-heading'>
+						<p>
+							Listas de Venta
+							<button type="button" class="btn btn-success pull-right"><i class='icon-qrcode icon-small'></i> Escanear QR</button>
+							<button type="button" id="realizaVenta" class="btn btn-primary pull-right" ><span class='glyphicon glyphicon-new-window'></span> Realizar</button>						
+						</p>
+    				</div>
+    				<div class='panel-body'>
+    					<?php 
+    					if(existSaleList(getUsuId())==0){
+    						getSaleList(getUsuId());
+    					}
+						?>
+    					<table id="idTableSaleList" saleid="<?php echo existSaleList(getUsuId()) ?>" class="table table-striped">
+	                    	<thead>
+	                        	<tr>
+	                            	<th>Modelo</th>
+	                            	<th>Talla</th>
+	                            	<th>Color</th>
+	                            	<th>Precio</th>
+	                            	<th>Acción</th>
+	                        	</tr>
+	                    	</thead>
+	        				<tbody>
+	        					<?php 
+		    					if(existSaleList(getUsuId())>0){
+		    						getSaleList(getUsuId());
+		    					}
+								?>
+	        				</tbody>
+        				</table>
+    				</div>
   				</div>
     		</div>
     	</div>
     </div>
 
     <?php include("footer.php"); ?>
-
-    <?php include("js.php"); ?>
 	
-	<!-- Modal -->
 	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   		<div class="modal-dialog" role="document">
     		<div class="modal-content">
       			<div class="modal-header">
         			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        			<h4 class="modal-title" id="modalTitle">Modal title</h4>
+        			<h4 class="modal-title">Error</h4>
+      			</div>
+      			<div class="modal-body">
+        			<div id="modalTitle" class='alert alizarin' role='alert'>...</div>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Aceptar</button>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+	
+	<div class="modal fade" id="modalSale" tabindex="-1" role="dialog" aria-labelledby="ModalSale">
+  		<div class="modal-dialog modal-lg" role="document">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        			<h4 class="modal-title">Detalle de Venta</h4>
       			</div>
       			<div class="modal-body">
         			...
       			</div>
       			<div class="modal-footer">
-        			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        			<button type="button" class="btn btn-primary">Save changes</button>
+      				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+        			<button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
       			</div>
     		</div>
   		</div>
 	</div>
+	
+	<?php include("js.php"); ?>
 	
 </body>
 </html>

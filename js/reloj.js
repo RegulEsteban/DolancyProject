@@ -21,7 +21,7 @@ function show5(){
          seconds="0"+seconds
         
          //change font size here to your desire
-         myclock="<h1>"+hours+":"+minutes+":"+seconds+" "+dn+"</h1>"
+         myclock="<h3><small>Hora Actual</small> "+hours+":"+minutes+":"+seconds+" "+dn+"</h3>"
         
          if (document.layers){
         	document.layers.liveclock.document.write(myclock)

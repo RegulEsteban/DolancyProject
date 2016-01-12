@@ -49,7 +49,7 @@ CREATE TABLE detail_stock (
 	--exist INT,
 	date_stock_up TIMESTAMP NOT NULL,
 	date_stock_down TIMESTAMP NOT NULL,
-	--status_send INT DEFAULT 0, -- 0 - sin movimiento, 1 - enviado, 2 - recibido
+	status INT DEFAULT 0, -- 0 - almacen, 1 - lista de venta, 2 - vendido, 3 - cambiado
 	PRIMARY KEY (stockid),
 	FOREIGN KEY (branchid) REFERENCES branch(branchid),
 	FOREIGN KEY (shoeid) REFERENCES shoe(shoeid)

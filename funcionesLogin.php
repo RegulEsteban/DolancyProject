@@ -46,6 +46,22 @@ function getBranchId(){
 	}
 }
 
+function getBranchName(){
+	if($_SESSION["dolancySession"]){
+		return $_SESSION["branch_name"];
+	}else{
+		return 0;
+	}
+}
+
+function getBranchAddress(){
+	if($_SESSION["dolancySession"]){
+		return $_SESSION["branch_address"];
+	}else{
+		return 0;
+	}
+}
+
 function toggleLogin()
 {
 	if(isLogin()) {
