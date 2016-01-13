@@ -164,7 +164,7 @@ function getDiscounts($type){
 
 function getEmployee($employeeid){
 	$query=new Query();
-	$values = $query->select("e.firstname, e.lastname, e.matname, e.email, e.phone, e.address, e.type_employee, b.name branch_name, b.address","employee e join branch b on b.employeeid = e.employeeid","e.employeeid = $employeeid ","","obj");
+	$values = $query->select("e.firstname, e.lastname, e.matname, e.email, e.phone, e.address, e.type_employee, b.name branch_name, b.address as address_branch","employee e join branch b on b.employeeid = e.employeeid","e.employeeid = $employeeid ","","obj");
 	
 	if(count($values)==1){
 		echo "<div class='media'><div class='pull-left'><i class='icon-user icon-md'></i></div><div class='media-body'>";
@@ -180,7 +180,7 @@ function getEmployee($employeeid){
 		foreach ($values as $em){
 			echo "<h4>Sucursal</h4>
 					<i class='icon-tag icon-small'></i> Nombre: ".$em->branch_name."<br/>
-					<i class='icon-map-marker icon-small'></i> Dirección: ".$em->address."<br/>";
+					<i class='icon-map-marker icon-small'></i> Dirección: ".$em->address_branch."<br/>";
 		}
 		echo "</div></div>";
 	}else{
