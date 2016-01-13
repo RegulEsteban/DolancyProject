@@ -147,6 +147,21 @@ function getModels(){
 	}
 }
 
+function getDiscounts($type){
+	$query=new Query();
+	$values = $query->select("discountid, monto, description","cash_discount","type = $type","","obj");
+	if(count($values)>0){
+		echo "<select id='discount_select' name='discount_select' class='form-control'>";
+		echo "<option value='0' selected>Seleccione un descuento</option>";
+		foreach ($values as $d){
+			echo "<option value='".$d->discountid."' monto='".$d->monto."'>".$d->description."</option>";
+		}
+		echo "</select>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>No hay descuentos disponibles.</div>";
+	}
+}
+
 function getEmployee($employeeid){
 	$query=new Query();
 	$values = $query->select("e.firstname, e.lastname, e.matname, e.email, e.phone, e.address, e.type_employee, b.name branch_name, b.address","employee e join branch b on b.employeeid = e.employeeid","e.employeeid = $employeeid ","","obj");
@@ -240,7 +255,7 @@ function getShoes($branchid){
                   	<td>'.$stock->model.'</td>
                   	<td>'.$stock->size.'</td>
                   	<td>'.$stock->color.'</td>
-                  	<td>'.$stock->price.'</td>
+                  	<td class="viewDiscount">'.$stock->price.'</td>
                   	<td><code>'.$stock->branch_name.'</code> <i class="icon-home icon-small"></i> '.$stock->branch_address.'</td>';
 			if($stock->status==1){
 				echo '<td><i class="icon-frown icon-small"></i> No disponible</td>';

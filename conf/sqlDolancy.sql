@@ -56,7 +56,7 @@ CREATE TABLE detail_stock (
 );
 
 CREATE TABLE sale (
-	saleid INT PRIMARY KEY NOT NULL,
+	saleid INT PRIMARY KEY AUTOINCREMENT,
 	date_sale TIMESTAMP NOT NULL,
 	employeeid INT NOT NULL,
 	client_opid INT,
@@ -139,14 +139,8 @@ CREATE TABLE cash_discount(
 	porcentage INT NULL,
 	monto DECIMAL(9,2) NULL,
 	description VARCHAR(200) NULL,
+	date_expiration TIMESTAMP NOT NULL,
+	type INT NOT NULL, -- 0 sobre producto, 1 sobre venta
+	acumulated INT DEFAULT 0, -- 0 no acumulable, 1 acumulable
 	PRIMARY KEY (discountid)
-);
-
-CREATE TABLE detail_discount(
-	detail_discountid INT PRIMARY KEY NOT NULL,
-	discountid INT NOT NULL,
-	saleid INT NULL,
-	detail_sale_id INT NULL,
-	date_discount TIMESTAMP NOT NULL,
-	FOREIGN KEY (discountid) REFERENCES cash_discount(discountid)
 );

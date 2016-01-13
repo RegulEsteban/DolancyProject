@@ -1,10 +1,12 @@
-select shoe.price, m.title As ss, c.title, z.size from detail_sale ds
+select shoe.price, m.title As ss, c.title, z.size, ds.discountid
+from detail_sale ds
 join detail_stock s on ds.stockid = s.stockid
 join shoe on s.shoeid = shoe.shoeid
 join model m on m.modelid = shoe.modelid
 join sizes z on z.sizesid = shoe.sizesid
 join color c on c.colorid = shoe.colorid
-where ds.saleid=1;
+--join cash_discount cd on cd.discountid = ds.discountid
+where ds.saleid = 4;
 
 select shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address 
 from detail_stock s

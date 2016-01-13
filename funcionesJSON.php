@@ -144,6 +144,55 @@ if($_POST)
     		$miArray = array("error"=>"No hay venta seleccionada. Favor de solicitar al administrador.");
     		echo json_encode($miArray);
     	}
+    }else if($_POST["getSale"]){
+    	$saleid = $_POST["saleid"];
+    	
+    	$query = new Query();
+    	if($saleid!=0){
+    		$shoes = $query->select("shoe.price as price, m.title as model, c.title as color, z.size as size, ds.discountid",
+    							"detail_sale ds
+								join detail_stock s on ds.stockid = s.stockid
+								join shoe on s.shoeid = shoe.shoeid
+								join model m on m.modelid = shoe.modelid
+								join sizes z on z.sizesid = shoe.sizesid
+								join color c on c.colorid = shoe.colorid",
+    							"ds.saleid = $saleid","","obj");
+    		
+    		if(count($shoes)>0){
+    			$res = "";
+    			foreach ($shoes as $shoe){
+    				$res = $res."<tr>
+    							<td>$shoe->model</td>
+    							<td>$shoe->color</td>
+    							<td>$shoe->size</td>
+    							<td>$shoe->price</td>";
+    				
+    				if($shoe->discountid!=0){
+    					$discount = $query->select("monto, description","cash_discount","discountid = $shoe->discountid","and type=0","obj");
+    					if(count($discount)==1){
+    						foreach ($discount as $d){
+    							$descuento = ($shoe->price)-($d->monto);
+    							$res = $res."<td>$descuento</td>";
+    						}
+    					}else{
+    						$miArray = array("error"=>"Demasiados descuento para un solo producto.");
+    						echo json_encode($miArray);
+    					}
+    				}else{
+    					$res = $res."<td>$shoe->price</td>";
+    				}
+    				$res = $res."</tr>";
+    			}
+    			$miArray = array("error"=>null, "resultado"=>$res);
+    			echo json_encode($miArray);
+    		}else{
+    			$miArray = array("error"=>"No hay productos en lista de venta.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"No hay venta seleccionada. Favor de solicitar al administrador.");
+    		echo json_encode($miArray);
+    	}
     }
     
 //     if($_POST["id_estado"])

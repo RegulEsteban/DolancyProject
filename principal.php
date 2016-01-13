@@ -134,11 +134,70 @@ if(!isLogin()){
         			<h4 class="modal-title">Detalle de Venta</h4>
       			</div>
       			<div class="modal-body">
-        			...
+        			
+        			<div class="row">
+    					<div class="col-xs-6">
+    						<form>
+  								<div class="form-group">
+    								<label for="exampleInputEmail1">Email address</label>
+    								<input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+  								</div>
+  								<div class="form-group">
+    								<label for="exampleInputPassword1">Password</label>
+    								<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+  								</div>
+							</form>
+    					</div>
+    					<div class="col-xs-6">
+    					</div>
+    				</div>
+    				
+    				<div class="row">
+    					<div id="contenidoModal" class="col-xs-12">
+    						<table id="getSaleTable" class="table table-striped">
+			                    <thead>
+			                        <tr>
+			                            <th>Modelo</th>
+			                            <th>Color</th>
+			                            <th>Talla</th>
+			                            <th>Precio</th>
+			                            <th>Precio con descuento</th>
+			                        </tr>
+			                    </thead>
+			                    <tbody>
+			                    </tbody>
+			            	</table>
+    					</div>
+    				</div>
+    				
       			</div>
       			<div class="modal-footer">
       				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
         			<button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+	
+	
+	<div class="modal fade" id="modalDiscount" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  		<div class="modal-dialog" role="document">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        			<h4 class="modal-title">Descuentos</h4>
+      			</div>
+      			<div class="modal-body">
+					<form>
+  						<div class="form-group">
+    						<label for="labelDiscount">Descuentos Disponibles</label>
+    						<?php getDiscounts(0); ?>
+  						</div>
+					</form>
+					<div id="testDiscount" class="alert alert-success" role="alert">...</div>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Aceptar</button>
       			</div>
     		</div>
   		</div>

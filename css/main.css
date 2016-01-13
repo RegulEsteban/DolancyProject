@@ -866,6 +866,9 @@ ul.tag-cloud li {
   margin-left: 10px;
   border: 0;
 }
+.modal-lg {
+  width: 80%;
+}
 .gap {
   margin-bottom: 50px;
 }
