@@ -91,6 +91,7 @@ if(!isLogin()){
 	                            	<th>Color</th>
 	                            	<th>Precio</th>
 	                            	<th>Acción</th>
+	                            	<th>Adicional</th>
 	                        	</tr>
 	                    	</thead>
 	        				<tbody>
@@ -134,21 +135,27 @@ if(!isLogin()){
         			<h4 class="modal-title">Detalle de Venta</h4>
       			</div>
       			<div class="modal-body">
-        			
         			<div class="row">
     					<div class="col-xs-6">
     						<form>
+    							<p>Cliente</p>
   								<div class="form-group">
-    								<label for="exampleInputEmail1">Email address</label>
-    								<input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+    								<label for="client_nombre_label">Nombre:</label>
+    								<input type="text" class="form-control" id="client_name" placeholder="Sin cliente" disabled>
   								</div>
   								<div class="form-group">
-    								<label for="exampleInputPassword1">Password</label>
-    								<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+    								<label for="client_email_label">Email:</label>
+    								<input type="email" class="form-control" id="client_email" placeholder="Sin cliente" disabled>
+  								</div>
+  								<div class="form-group">
+    								<label for="client_phone_label">Teléfono:</label>
+    								<input type="text" class="form-control" id="client_phone" placeholder="Sin cliente" disabled>
   								</div>
 							</form>
     					</div>
     					<div class="col-xs-6">
+    						<p>Total:</p>
+    						<div id="totalComponent"></div>
     					</div>
     				</div>
     				
@@ -197,7 +204,8 @@ if(!isLogin()){
 					<div id="testDiscount" class="alert alert-success" role="alert">...</div>
       			</div>
       			<div class="modal-footer">
-        			<button type="button" class="btn btn-default" data-dismiss="modal">Aceptar</button>
+      				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+        			<button type="button" id="applicateDiscount" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
       			</div>
     		</div>
   		</div>

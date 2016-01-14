@@ -26,7 +26,9 @@ $(function()
 $(document).on('click', ".removeShoeSaleList", removeShoe);
 $(document).on('click', ".addShoeList", addShoe);
 $(document).on('click', "#realizaVenta", realizaVenta);
+$(document).on('click', ".applyDiscount", applyDiscount);
 $(document).on('mousedown', ".viewDiscount", viewDiscount);
+$(document).on('click', "#applicateDiscount", applicateDiscount);
 
 function removeShoe(event){
 	var row = $(this).parents('tr')[0];
@@ -59,7 +61,9 @@ function addShoe(event){
 					'</td><td>'+respuesta.size+
 					'</td><td>'+respuesta.color+
 					'</td><td>'+respuesta.price+
-					'</td><td><a href="#" class="removeShoeSaleList" stockid="'+respuesta.stockid+'"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td></tr>');
+					'</td><td><a href="#" class="removeShoeSaleList" stockid="'+respuesta.stockid+'"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td>'+
+					'<td><a href="#" class="applyDiscount" stockidApply="'+respuesta.stockid+'"><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>'+
+					'</tr>');
 			row.remove();
 		}
 	}, 'json');
@@ -77,8 +81,9 @@ function realizaVenta(e){
 				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
 				$('#myModal').modal('show');
 			}else{
-				$('#modalSale').modal('show');
 				$('#getSaleTable tbody').html(respuesta.resultado);
+				$("#totalComponent").html(respuesta.total);
+				$('#modalSale').modal('show');
 			}
 		}, 'json');
 	}
@@ -87,12 +92,15 @@ function realizaVenta(e){
 function viewDiscount(e){
 	if(e.button == 2){
 		var precio = $(this).html();
-		var discount = 0;
-		if(discount==='undefined'){
+		var discount = $("#discount_select").val();
+		$("#applicateDiscount").hide();
+		
+		if(discount === 'undefined'){
 			$("#testDiscount").html("No se puede aplicar.");
 		}else{
 			$("#testDiscount").html("<h2>$"+(precio-discount)+"</h2>");
 			
+			$("#discount_select").val('0');
 			$('#discount_select').on('change', function() {
 				  discount = $('#discount_select option:selected').attr('monto');
 				  $("#testDiscount").html("<h2>$"+(precio-discount)+"</h2>");
@@ -100,5 +108,46 @@ function viewDiscount(e){
 		}
 		
 		$("#modalDiscount").modal('show');
+	}
+}
+
+function applyDiscount(event){
+	var detail_sale_id = $(event.target).attr("stockidApply");
+	var discount = $("#discount_select").val();
+	
+	$("#applicateDiscount").show();
+	
+	$("#testDiscount").html("...");
+	$("#applicateDiscount").html("Aplicar Descuento");
+	
+	if(discount === 'undefined'){
+		$("#testDiscount").html("No se puede aplicar.");
+		$("#applicateDiscount").hide();
+	}else{
+		$("#discount_select").attr("stockToDiscount", detail_sale_id);
+		$("#discount_select").val('0');
+		$('#discount_select').on('change', function() {
+			  discount = $('#discount_select option:selected').attr('monto');
+			  $("#testDiscount").html("<h2>$"+discount+"</h2>");
+		});
+	}
+	
+	$("#modalDiscount").modal('show');
+}
+
+function applicateDiscount(e){
+	var discountid = $("#discount_select").val();
+	var detail_sale_id = $("#discount_select").attr("stockToDiscount");
+	
+	if(discountid==='0'){
+		$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span>Debe de seleccionar al menos una opción de descuento.");
+		$('#myModal').modal('show');
+	}else{
+		$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, discountid: discountid, appDiscount: true}, function(respuesta){
+			if(respuesta.error != null){
+				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
+				$('#myModal').modal('show');
+			}
+		}, 'json');
 	}
 }

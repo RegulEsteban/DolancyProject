@@ -20,3 +20,5 @@ where m.modelid = 1 and z.sizesid = 1 and c.colorid = 1;
 select * from employee e
 join branch b on b.employeeid = e.employeeid
 where e.employeeid = 1;
+
+select * from detail_sale;

@@ -39,7 +39,7 @@ if($_POST)
                   		<td>'.$stock->model.'</td>
                   		<td>'.$stock->size.'</td>
                   		<td>'.$stock->color.'</td>
-                  		<td>'.$stock->price.'</td>
+                  		<td class="viewDiscount">'.$stock->price.'</td>
                   		<td><code>'.$stock->branch_name.'</code> <i class="icon-home icon-small"></i> '.$stock->branch_address.'</td>';
     			if($stock->status==1){
     				$result=$result.'<td><i class="icon-frown icon-small"></i> No disponible</td>';
@@ -160,6 +160,7 @@ if($_POST)
     		
     		if(count($shoes)>0){
     			$res = "";
+    			$total = 0.0;
     			foreach ($shoes as $shoe){
     				$res = $res."<tr>
     							<td>$shoe->model</td>
@@ -172,7 +173,8 @@ if($_POST)
     					if(count($discount)==1){
     						foreach ($discount as $d){
     							$descuento = ($shoe->price)-($d->monto);
-    							$res = $res."<td>$descuento</td>";
+    							$res = $res."<td>".number_format($descuento, 2, '.', '')."</td>";
+    							$total = $total + $descuento;
     						}
     					}else{
     						$miArray = array("error"=>"Demasiados descuento para un solo producto.");
@@ -180,10 +182,11 @@ if($_POST)
     					}
     				}else{
     					$res = $res."<td>$shoe->price</td>";
+    					$total = $total + $shoe->price;
     				}
     				$res = $res."</tr>";
     			}
-    			$miArray = array("error"=>null, "resultado"=>$res);
+    			$miArray = array("error"=>null, "resultado"=>$res, "total"=>"<h1>$".number_format($total, 2, '.', ',')."</h1>");
     			echo json_encode($miArray);
     		}else{
     			$miArray = array("error"=>"No hay productos en lista de venta.");
@@ -191,6 +194,23 @@ if($_POST)
     		}
     	}else{
     		$miArray = array("error"=>"No hay venta seleccionada. Favor de solicitar al administrador.");
+    		echo json_encode($miArray);
+    	}
+    }else if($_POST["appDiscount"]){
+    	$detailSaleId = $_POST["detailSaleId"];
+    	$discountid = $_POST["discountid"];
+    	
+    	$query = new Query();
+    	if($detailSaleId!=0 && $discountid!=0){
+    		if($query->update("detail_sale","discountid = $discountid", "detail_sale_id = $detailSaleId","")){
+    			$miArray = array("error"=>null);
+    			echo json_encode($miArray);
+    		}else{
+    			$miArray = array("error"=>"No se pudo aplicar el descuento. Favor de solicitar al administrador.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"Los valores para el descuento son incorrectos. Favor de solicitar al administrador.");
     		echo json_encode($miArray);
     	}
     }

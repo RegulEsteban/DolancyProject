@@ -152,7 +152,7 @@ function getDiscounts($type){
 	$values = $query->select("discountid, monto, description","cash_discount","type = $type","","obj");
 	if(count($values)>0){
 		echo "<select id='discount_select' name='discount_select' class='form-control'>";
-		echo "<option value='0' selected>Seleccione un descuento</option>";
+		echo "<option value='0' monto='0' selected>Seleccione un descuento</option>";
 		foreach ($values as $d){
 			echo "<option value='".$d->discountid."' monto='".$d->monto."'>".$d->description."</option>";
 		}
@@ -205,7 +205,7 @@ function getSaleList($employeeid){
 	$ventas = $query->select("saleid, employeeid, client_opid, total", "sale", "employeeid = $employeeid", "and status=0", "obj");
 	if(count($ventas)==1){
 		foreach ($ventas as $venta){
-			$stocks = $query->select("shoe.price, m.title as model, c.title as color, z.size as size, s.stockid as id ",
+			$stocks = $query->select("shoe.price, m.title as model, c.title as color, z.size as size, s.stockid as id, ds.detail_sale_id ",
 									"detail_sale ds
 									join detail_stock s on ds.stockid = s.stockid
 									join shoe on s.shoeid = shoe.shoeid
@@ -221,6 +221,7 @@ function getSaleList($employeeid){
                   			<td>'.$stock->color.'</td>
                   			<td>'.$stock->price.'</td>
                   			<td><a href="#" class="removeShoeSaleList" stockid='.$stock->id.'><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td>
+                  			<td><a href="#" class="applyDiscount" stockidApply='.$stock->detail_sale_id.'><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>
 						</tr>';
 				}
 			}
