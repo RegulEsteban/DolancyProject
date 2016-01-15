@@ -213,6 +213,29 @@ if($_POST)
     		$miArray = array("error"=>"Los valores para el descuento son incorrectos. Favor de solicitar al administrador.");
     		echo json_encode($miArray);
     	}
+    }else if($_POST["getClients"]){
+    	$query = new Query();
+    	$clients = $query->select("firstname, lastname, matname, email, phone, clientid","client","1=1","","obj");
+    	if(count($clients)>0){
+    		$miArray = array("error"=>null,"resultado"=>$clients);
+    		echo json_encode($miArray);
+    	}else{
+    		$miArray = array("error"=>"Sin valores");
+    		echo json_encode($miArray);
+    		
+    	}
+    }else if($_POST["saveClient"]){
+    	$clientid = $_POST["clientid"];
+    	$saleid = $_POST["saleid"];
+    	
+    	$query = new Query();
+    	if($query->update("sale", "client_opid = $clientid", "saleid = $saleid","")){
+    		$miArray = array("error"=>null);
+    		echo json_encode($miArray);
+    	}else{
+    		$miArray = array("error"=>"Error al asignar cliente a venta.");
+    		echo json_encode($miArray);
+    	}
     }
     
 //     if($_POST["id_estado"])

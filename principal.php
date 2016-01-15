@@ -134,24 +134,20 @@ if(!isLogin()){
         			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         			<h4 class="modal-title">Detalle de Venta</h4>
       			</div>
-      			<div class="modal-body">
+      			<div id="services" class="modal-body">
         			<div class="row">
     					<div class="col-xs-6">
-    						<form>
-    							<p>Cliente</p>
-  								<div class="form-group">
-    								<label for="client_nombre_label">Nombre:</label>
-    								<input type="text" class="form-control" id="client_name" placeholder="Sin cliente" disabled>
-  								</div>
-  								<div class="form-group">
-    								<label for="client_email_label">Email:</label>
-    								<input type="email" class="form-control" id="client_email" placeholder="Sin cliente" disabled>
-  								</div>
-  								<div class="form-group">
-    								<label for="client_phone_label">Teléfono:</label>
-    								<input type="text" class="form-control" id="client_phone" placeholder="Sin cliente" disabled>
-  								</div>
-							</form>
+    						
+    						<div class='media'>
+    							<div class='pull-left'><i class='icon-user icon-md'></i></div>
+    							<div class='media-body'>
+    								<h3>Cliente</h3>
+    								<i class='icon-user icon-small'></i> Nombre: <br/>
+    								<i class='icon-envelope icon-small'></i> Email: <br/>
+    								<i class='icon-phone icon-small'></i> Teléfono: <br/>
+    							</div>
+    						</div>
+    						
     					</div>
     					<div class="col-xs-6">
     						<p>Total:</p>
@@ -206,6 +202,69 @@ if(!isLogin()){
       			<div class="modal-footer">
       				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
         			<button type="button" id="applicateDiscount" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+	
+	<div class="modal fade" id="clientModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  		<div class="modal-dialog modal-lg" role="document">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" id="omiteClient" class="btn btn-default btn-small pull-right" data-dismiss="modal" aria-label="Omitir Cliente">Omitir Cliente <span class='glyphicon glyphicon-chevron-right'></span></button>
+        			<h4 class="modal-title">Seleccionar Cliente</h4>
+      			</div>
+      			<div class="modal-body">
+        			<ul class="nav nav-tabs nav-justified" id="sampleTabs">
+					  	<li role="presentation" class="active" id="newClientTab"><a href="#newClient" aria-controls="newClient" role="tab" data-toggle="tab">Nuevo</a></li>
+					  	<li role="presentation" id="tableClientTab"><a href="#tableClient" aria-controls="tableClient" role="tab" data-toggle="tab">Seleccionar</a></li>
+					</ul>
+					
+					<div class="tab-content">
+					    <div role="tabpanel" class="tab-pane fade in active" id="newClient">
+					    	<form id="newClientForm">
+    							<p>Llene los campos para dar de alta un nuevo cliente.</p>
+  								<div class="form-group">
+    								<label for="client_nombre_label">Nombres:</label>
+    								<input type="text" class="form-control" id="client_name" placeholder="Nombre(s)" required>
+  								</div>
+  								<div class="form-group">
+    								<label for="client_nombre_label">Apellido Paterno:</label>
+    								<input type="text" class="form-control" id="client_lastname" placeholder="Apellido Paterno" required>
+  								</div>
+  								<div class="form-group">
+    								<label for="client_nombre_label">Apellido Materno:</label>
+    								<input type="text" class="form-control" id="client_matname" placeholder="Opcional">
+  								</div>
+  								<div class="form-group">
+    								<label for="client_email_label">Email:</label>
+    								<input type="email" class="form-control" id="client_email" placeholder="Correo Electrónico" required>
+  								</div>
+  								<div class="form-group">
+    								<label for="client_phone_label">Teléfono:</label>
+    								<input type="text" class="form-control" id="client_phone" placeholder="Celular o de Casa" required>
+  								</div>
+							</form>
+					    </div>
+					    <div role="tabpanel" class="tab-pane fade" id="tableClient">
+					    	<table id="example" class="display" cellspacing="0" width="100%">
+			                    <thead>
+			                        <tr>
+			                        	<th>Identificador</th>
+			                            <th>Nombre</th>
+			                            <th>Email</th>
+			                            <th>Teléfono</th>
+			                        </tr>
+			                    </thead>
+			                    <tbody>
+			                    </tbody>
+			            	</table>
+			            </div>
+					 </div>
+      			</div>
+      			<div class="modal-footer">
+      				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+        			<button type="button" id="saveClient" class="btn btn-primary">Aceptar</button>
       			</div>
     		</div>
   		</div>

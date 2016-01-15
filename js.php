@@ -33,7 +33,7 @@
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
             },
-            bFilter: false, bLengthChange: false
+            bInfo: false, bLengthChange: false
         });
     });
 </script>

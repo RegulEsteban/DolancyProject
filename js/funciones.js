@@ -29,6 +29,7 @@ $(document).on('click', "#realizaVenta", realizaVenta);
 $(document).on('click', ".applyDiscount", applyDiscount);
 $(document).on('mousedown', ".viewDiscount", viewDiscount);
 $(document).on('click', "#applicateDiscount", applicateDiscount);
+$(document).on('click', "#saveClient", saveClient);
 
 function removeShoe(event){
 	var row = $(this).parents('tr')[0];
@@ -69,10 +70,38 @@ function addShoe(event){
 	}, 'json');
 }
 
-function realizaVenta(e){
-	var saleid = $("#idTableSaleList").attr("saleid");
+function saveClient(e){
+	var tabActive = $("ul#sampleTabs li.active")[0].id;
+	var tabla = $("#example").DataTable();
+	if(tabActive === 'newClientTab'){
+		
+	}else if(tabActive === 'tableClientTab'){
+		if(tabla.row('.selected').data() === undefined){
+			console.log("manda sin cliente");
+		}else{
+			var clientid = tabla.row('.selected').data()[0];
+			var saleid = $("#idTableSaleList").attr("saleid");
+			
+			$.post("funcionesJSON.php", { clientid: clientid, saleid: saleid, saveClient: true}, function(respuesta){
+				if(respuesta.error != null){
+					$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
+					$('#myModal').modal('show');
+				}else{
+					
+					
+				}
+			}, 'json');
+		}
+		
+	}else{
+		return false;
+	}
+}
 
-	if(saleid===null || saleid==='undefined' || saleid==='0'){
+function showSaleList(e){
+	var saleid = $("#idTableSaleList").attr("saleid");
+	
+	if(saleid===null || saleid===undefined || saleid==='0'){
 		$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> Error!!! No existe venta. Favor de llamar a su administrador.");
 		$('#myModal').modal('show');
 	}else{
@@ -89,13 +118,46 @@ function realizaVenta(e){
 	}
 }
 
+function realizaVenta(e){
+	var tabla = $("#example").DataTable();
+	tabla.clear().draw();
+	
+	$.post("funcionesJSON.php", { getClients: true }, function(respuesta){
+		if(respuesta.error != null){
+			$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
+			$('#myModal').modal('show');
+		}else{
+			var res = respuesta.resultado;
+			for( var index in res){
+				tabla.row.add([res[index].clientid, 
+				               res[index].firstname+' '+res[index].lastname+' '+res[index].matname, 
+				               res[index].email, 
+				               res[index].phone])
+				               .draw();
+			}
+			
+			$('#example tbody').on( 'click', 'tr', function () {
+		        if ( $(this).hasClass('selected') ) {
+		            $(this).removeClass('selected');
+		        }else {
+		            tabla.$('tr.selected').removeClass('selected');
+		            $(this).addClass('selected');
+		        }
+		    });
+			
+			$('#clientModal').modal('show');
+		}
+	}, 'json');
+	
+}
+
 function viewDiscount(e){
 	if(e.button == 2){
 		var precio = $(this).html();
 		var discount = $("#discount_select").val();
 		$("#applicateDiscount").hide();
 		
-		if(discount === 'undefined'){
+		if(discount === undefined){
 			$("#testDiscount").html("No se puede aplicar.");
 		}else{
 			$("#testDiscount").html("<h2>$"+(precio-discount)+"</h2>");
@@ -120,7 +182,7 @@ function applyDiscount(event){
 	$("#testDiscount").html("...");
 	$("#applicateDiscount").html("Aplicar Descuento");
 	
-	if(discount === 'undefined'){
+	if(discount === undefined){
 		$("#testDiscount").html("No se puede aplicar.");
 		$("#applicateDiscount").hide();
 	}else{
