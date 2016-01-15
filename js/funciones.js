@@ -73,24 +73,34 @@ function addShoe(event){
 function saveClient(e){
 	var tabActive = $("ul#sampleTabs li.active")[0].id;
 	var tabla = $("#example").DataTable();
+	
 	if(tabActive === 'newClientTab'){
+		
 		
 	}else if(tabActive === 'tableClientTab'){
 		if(tabla.row('.selected').data() === undefined){
-			console.log("manda sin cliente");
+			alert("Debe seleccionar un cliente para realizar la venta.");
 		}else{
 			var clientid = tabla.row('.selected').data()[0];
 			var saleid = $("#idTableSaleList").attr("saleid");
 			
-			$.post("funcionesJSON.php", { clientid: clientid, saleid: saleid, saveClient: true}, function(respuesta){
-				if(respuesta.error != null){
-					$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-					$('#myModal').modal('show');
-				}else{
-					
-					
-				}
-			}, 'json');
+			if(saleid===null || saleid===undefined || saleid==='0'){
+				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> Error!!! No existe venta. Favor de llamar a su administrador.");
+				$('#myModal').modal('show');
+			}else{
+				$.post("funcionesJSON.php", { clientid: clientid, saleid: saleid, saveClient: true}, function(respuesta){
+					if(respuesta.error != null){
+						$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
+						$('#myModal').modal('show');
+					}else{
+						$('#clientModal').modal('hide');
+						$('#datosCliente').html("<i class='icon-user icon-small'></i> Nombre: "+tabla.row('.selected').data()[1]+"<br/>" +
+												"<i class='icon-envelope icon-small'></i> Email: "+tabla.row('.selected').data()[2]+"<br/>" +
+												"<i class='icon-phone icon-small'></i> Teléfono: "+tabla.row('.selected').data()[3]+"<br/>")
+						showSaleList(e);
+					}
+				}, 'json');
+			}
 		}
 		
 	}else{

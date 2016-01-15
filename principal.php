@@ -137,17 +137,15 @@ if(!isLogin()){
       			<div id="services" class="modal-body">
         			<div class="row">
     					<div class="col-xs-6">
-    						
-    						<div class='media'>
-    							<div class='pull-left'><i class='icon-user icon-md'></i></div>
-    							<div class='media-body'>
-    								<h3>Cliente</h3>
-    								<i class='icon-user icon-small'></i> Nombre: <br/>
-    								<i class='icon-envelope icon-small'></i> Email: <br/>
-    								<i class='icon-phone icon-small'></i> Teléfono: <br/>
+    						<div class="panel panel-default">
+    							<div class='panel-heading'>Cliente</div>
+    							<div class="panel-body">
+    								<div class='media'>
+		    							<div class='pull-left'><i class='icon-user icon-md'></i></div>
+		    							<div id="datosCliente" class='media-body'></div>
+		    						</div>
     							</div>
     						</div>
-    						
     					</div>
     					<div class="col-xs-6">
     						<p>Total:</p>
@@ -245,6 +243,7 @@ if(!isLogin()){
     								<input type="text" class="form-control" id="client_phone" placeholder="Celular o de Casa" required>
   								</div>
 							</form>
+							<div id="errorFormClient" class="alert alert-success" role="alert" hidden="hidden"></div>
 					    </div>
 					    <div role="tabpanel" class="tab-pane fade" id="tableClient">
 					    	<table id="example" class="display" cellspacing="0" width="100%">
