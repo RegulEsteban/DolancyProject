@@ -224,23 +224,23 @@ if(!isLogin()){
     							<p>Llene los campos para dar de alta un nuevo cliente.</p>
   								<div class="form-group">
     								<label for="client_nombre_label">Nombres:</label>
-    								<input type="text" class="form-control" id="client_name" placeholder="Nombre(s)" required>
+    								<input type="text" class="form-control" id="client_name" name="client_name" placeholder="Nombre(s)" required>
   								</div>
   								<div class="form-group">
     								<label for="client_nombre_label">Apellido Paterno:</label>
-    								<input type="text" class="form-control" id="client_lastname" placeholder="Apellido Paterno" required>
+    								<input type="text" class="form-control" id="client_lastname" name="client_lastname" placeholder="Apellido Paterno" required>
   								</div>
   								<div class="form-group">
     								<label for="client_nombre_label">Apellido Materno:</label>
-    								<input type="text" class="form-control" id="client_matname" placeholder="Opcional">
+    								<input type="text" class="form-control" id="client_matname" name="client_matname" placeholder="Opcional">
   								</div>
   								<div class="form-group">
     								<label for="client_email_label">Email:</label>
-    								<input type="email" class="form-control" id="client_email" placeholder="Correo Electrónico" required>
+    								<input type="email" class="form-control" id="client_email" name="client_email" placeholder="Correo Electrónico" required>
   								</div>
   								<div class="form-group">
     								<label for="client_phone_label">Teléfono:</label>
-    								<input type="text" class="form-control" id="client_phone" placeholder="Celular o de Casa" required>
+    								<input type="text" class="form-control" id="client_phone" name="client_phone" placeholder="Celular o de Casa" required>
   								</div>
 							</form>
 							<div id="errorFormClient" class="alert alert-success" role="alert" hidden="hidden"></div>

@@ -37,4 +37,5 @@
         });
     });
 </script>
+<script src="js/jquery.validate.js"></script>
 <script src="js/funciones.koinonia.js"></script>

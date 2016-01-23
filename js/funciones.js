@@ -21,6 +21,58 @@ $(function()
     		}
       },'json');
     });
+    
+    $('#newClientForm').validate({
+    	lang: 'es',
+        rules: {
+            client_name: {
+                minlength: 2,
+                required: true
+            },
+            client_lastname: {
+                minlength: 2,
+                required: true
+            },
+            client_matname: {
+                minlength: 2
+            },
+            client_email: {
+                required: true,
+                email: true
+            },
+            client_phone: {
+                minlength: 10,
+                maxlength: 10,
+                required: true
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+        },
+        errorElement: 'span',
+        errorClass: 'help-block',
+        errorPlacement: function(error, element) {
+            if(element.parent('.form-control').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+        }
+    });
+    
+    
+    $('#example tbody').on( 'click', 'tr', function () {
+        if ( $(this).hasClass('selected') ) {
+            $(this).removeClass('selected');
+        }else {
+        	$('#example').DataTable().$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }
+    });
+    
 });
 
 $(document).on('click', ".removeShoeSaleList", removeShoe);
@@ -73,16 +125,35 @@ function addShoe(event){
 function saveClient(e){
 	var tabActive = $("ul#sampleTabs li.active")[0].id;
 	var tabla = $("#example").DataTable();
-	
+	var saleid = $("#idTableSaleList").attr("saleid");
 	if(tabActive === 'newClientTab'){
-		
-		
+		var isValid = $('#newClientForm').valid();
+		if(isValid === true){
+			$.post("funcionesJSON.php", { client_name: $('#client_name').val(), 
+										client_lastname: $('#client_lastname').val(),
+										client_matname: $('#client_matname').val(),
+										client_email: $('#client_email').val(),
+										client_phone: $('#client_phone').val(),
+										saleid: saleid, saveNewClient: true}, function(respuesta){
+				if(respuesta.error != null){
+					$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
+					$('#myModal').modal('show');
+				}else{
+					$('#clientModal').modal('hide');
+					$('#datosCliente').html("<i class='icon-user icon-small'></i> Nombre: "+$('#client_name').val()+" "+$('#client_lastname').val()+" "+$('#client_matname').val()+"<br/>" +
+											"<i class='icon-envelope icon-small'></i> Email: "+$('#client_email').val()+"<br/>" +
+											"<i class='icon-phone icon-small'></i> Teléfono: "+$('#client_phone').val()+"<br/>")
+					showSaleList(e);
+					$('#newClientForm')[0].reset();
+				}
+			}, 'json');
+			
+		}
 	}else if(tabActive === 'tableClientTab'){
 		if(tabla.row('.selected').data() === undefined){
 			alert("Debe seleccionar un cliente para realizar la venta.");
 		}else{
 			var clientid = tabla.row('.selected').data()[0];
-			var saleid = $("#idTableSaleList").attr("saleid");
 			
 			if(saleid===null || saleid===undefined || saleid==='0'){
 				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> Error!!! No existe venta. Favor de llamar a su administrador.");
@@ -145,15 +216,6 @@ function realizaVenta(e){
 				               res[index].phone])
 				               .draw();
 			}
-			
-			$('#example tbody').on( 'click', 'tr', function () {
-		        if ( $(this).hasClass('selected') ) {
-		            $(this).removeClass('selected');
-		        }else {
-		            tabla.$('tr.selected').removeClass('selected');
-		            $(this).addClass('selected');
-		        }
-		    });
 			
 			$('#clientModal').modal('show');
 		}

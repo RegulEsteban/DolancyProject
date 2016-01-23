@@ -236,77 +236,42 @@ if($_POST)
     		$miArray = array("error"=>"Error al asignar cliente a venta.");
     		echo json_encode($miArray);
     	}
+    }else if($_POST["saveNewClient"]){
+    	$name = $_POST["client_name"];
+    	$lastname = $_POST["client_lastname"];
+    	$matname = $_POST["client_matname"];
+    	$email = $_POST["client_email"];
+    	$phone = $_POST["client_phone"];
+    	$saleid = $_POST["saleid"];
+    	
+    	$query = new Query();
+    	$cliente = $query->select("clientid","client","firstname like '$name' and lastname like '$lastname' and email like '$email' and phone like '$phone'", "", "obj");
+    	if(count($cliente)>0){
+    		$cliente = $query->select("clientid","client","firstname like '$name' and lastname like '$lastname' and email like '$email' and phone like '$phone'", "", "arr");
+    		if($query->update("sale", "client_opid = $cliente[0]", "saleid = $saleid","")){
+    			$miArray = array("error"=>null);
+    			echo json_encode($miArray);
+    		}else{
+    			$miArray = array("error"=>"Error al asignar cliente a venta.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		if($query->insert("client", "firstname, lastname, matname, email, phone","'$name', '$lastname', '$matname', '$email', '$phone'","")){
+    			$cliente = $query->select("clientid","client","firstname like '$name' and lastname like '$lastname' and email like '$email' and phone like '$phone'", "", "arr");
+    			if($query->update("sale", "client_opid = $cliente[0]", "saleid = $saleid","")){
+    				$miArray = array("error"=>null);
+    				echo json_encode($miArray);
+    			}else{
+    				$miArray = array("error"=>"Error al asignar cliente a venta.");
+    				echo json_encode($miArray);
+    			}
+    		}else{
+    			$miArray = array("error"=>"Error al insertar nuevo cliente a venta.");
+    			echo json_encode($miArray);
+    		}
+    	}
     }
     
-//     if($_POST["id_estado"])
-//     {
-//         $id_estado=$_POST["id_estado"];
-        
-//         $query = new query();
-//         $municipios = $query->select("id, nombre", "municipio","idEstado=$id_estado");
-//         if ($municipios) 
-//         {
-//             foreach ($municipios as $municipio) {
-//                 $res .= '<option value="' . $municipio->id . '">'.utf8_encode($municipio->nombre).'</option>';
-//             }
-//             $miArray = array("respuesta"=>$res);
-//             echo json_encode($miArray);
-//         }else{
-//             echo json_encode("null");
-//         }
-//     }else if($_POST["id_koinonia"])
-//     {
-//         $id_koinonia=$_POST["id_koinonia"];
-//         $query = new query();
-//         if ($query->update("koinonia","status=1","id=$id_koinonia")) 
-//         {
-//             echo json_encode("success");
-//         }else{
-//             echo json_encode("null");
-//         }
-//     }else if($_POST["edad"] && $_POST["tipo"])
-//     {
-//         $edad=$_POST["edad"];
-//         $tipo=$_POST["tipo"];
-        
-//         $query = new query();
-//         $koinonias = $query->select("id, nombre", "koinonia","edad_min<=$edad and edad_max>=$edad and lugares_disponibles>0 and tipo='$tipo' and status=1");
-//         if ($koinonias) 
-//         {
-//             foreach ($koinonias as $koinonia) {
-//                 $res .= '<option value="' . $koinonia->id . '">' . $koinonia->nombre . '</option>';
-//             }
-//             $miArray = array("respuesta"=>$res);
-//             echo json_encode($miArray);
-//         }else{
-//             echo json_encode("null");
-//         }
-//     }else if($_POST["cod_emp"] && $_POST["curso"])
-//     {
-//         $idCurso=$_POST["curso"];
-//         $cod_empleado=$_POST["cod_emp"];
-        
-//         $query = new query();
-//         $empleado=$query->select("*", "empleado","status=1 and codigo_empleado=$cod_empleado","","arr");
-//         if($empleado)
-//         {
-//             $curso=$query->select("*","curso","status=1 and id=$idCurso","","arr");
-//             if($curso)
-//             {
-//                 if ($query->insert("detalle_curso","idCurso,idEmpleado","'$curso[0]','$empleado[0]'")) 
-//                 {
-//                     $miArray = array("respuesta"=>"ok");
-//                 }else{
-//                     $miArray = array("respuesta"=>"error");
-//                 }
-//             }else{
-//                 $miArray = array("respuesta"=>"error");
-//             }
-//         }else{
-//             $miArray = array("respuesta"=>"error");
-//         }
-//         echo json_encode($miArray);
-//     }
 }else if($_GET){
     
 }
