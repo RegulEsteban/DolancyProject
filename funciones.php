@@ -147,6 +147,21 @@ function getModels(){
 	}
 }
 
+function getBranchs(){
+	$query=new Query();
+	$values = $query->select("branchid, name, address","branch","status = 1","","obj");
+	if(count($values)>0){
+		echo "<select id='branch_select' name='branch_select' class='form-control'>";
+		echo "<option value='0' selected>Seleccione una Sucursal</option>";
+		foreach ($values as $b){
+			echo "<option value='".$b->branchid."'>".$b->name."</option>";
+		}
+		echo "</select>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>No hay sucursales disponibles.</div>";
+	}
+}
+
 function getDiscounts($type){
 	$query=new Query();
 	$values = $query->select("discountid, monto, description","cash_discount","type = $type","","obj");
@@ -164,8 +179,8 @@ function getDiscounts($type){
 
 function getEmployee($employeeid){
 	$query=new Query();
-	$values = $query->select("e.firstname, e.lastname, e.matname, e.email, e.phone, e.address, e.type_employee, b.name branch_name, b.address as address_branch","employee e join branch b on b.employeeid = e.employeeid","e.employeeid = $employeeid ","","obj");
-	
+	$values = $query->select("e.firstname, e.lastname, e.matname, e.email, e.phone, e.address, e.type_employee, b.name branch_name, b.address as address_branch","employee e join branch b on b.branchid = e.branchid","e.employeeid = $employeeid ","","obj");
+
 	if(count($values)==1){
 		echo "<div class='media'><div class='pull-left'><i class='icon-user icon-md'></i></div><div class='media-body'>";
 		foreach ($values as $em){
@@ -179,8 +194,8 @@ function getEmployee($employeeid){
 		echo "<div class='media'><div class='pull-left'><i class='icon-building icon-md'></i></div><div class='media-body'>";
 		foreach ($values as $em){
 			echo "<h4>Sucursal</h4>
-					<i class='icon-tag icon-small'></i> Nombre: ".$em->branch_name."<br/>
-					<i class='icon-map-marker icon-small'></i> Dirección: ".$em->address_branch."<br/>";
+					<i class='icon-tag icon-small'></i> Nombre: ".utf8_encode($em->branch_name)."<br/>
+					<i class='icon-map-marker icon-small'></i> Dirección: ".utf8_encode($em->address_branch)."<br/>";
 		}
 		echo "</div></div>";
 	}else{
@@ -271,76 +286,44 @@ function getShoes($branchid){
 	}
 }
 
-function editaDatos($tabla,$donde)
-{
-	include_once ("Query.inc");
+function getAllEmployees(){
 	$query=new Query();
-	$valores=$query->select("id_inscripciones,nombre,edad,estado,fecha_inscripcion,telefono,email_muestra,facebook,genero", $tabla,$donde);
-	echo  "<form class='form-horizontal' role='form' action='modificaReg.php' method='post'>";
-		if($valores)
-		{
-			foreach ($valores as $valor)
-			{
-				$valor->id_inscripciones;
-				$valor->nombre;
-				$valor->edad;
-				$valor->estado;
-				$valor->fecha_inscripcion;
-				$valor->telefono;
-				$valor->email_muestra;
-				$valor->facebook;
-				$valor->genero;
-			}
+	$values = $query->select("e.employeeid, e.firstname, e.lastname, e.matname, e.email, e.phone, e.address, e.type_employee, b.name branch_name, b.address as address_branch","employee e join branch b on b.branchid = e.branchid","e.status = 1","","obj");
+	echo "<table id='exampleEmployee' class='display' cellspacing='0' width='100%'>
+    			<thead>
+					<tr>
+                        <th>Nombre</th>
+						<th>Dirección</th>
+						<th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Sucursal</th>
+						<th>Sucursal - Dirección</th>
+						<th>Acción</th>
+                	</tr>
+                </thead>";
+	if(count($values)>0){
+		echo "<tbody>";
+		foreach ($values as $em){
+			$tipo = "";
+			if($em->type_employee == 0) $tipo="Vendedor";
+			else if($em->type_employee == 1) $tipo = "Gerente";
+			else if($em->type_employee == 2) $tipo = "Director";
 			
-			echo "
-			<div class='form-group'>
-		    <label class='col-sm-2 control-label'>Id: </label>
-		    <div class='col-sm-10'>
-		      <input type='text' class='form-control' name='id' value=".$valor->id_inscripciones." required>
-		    </div>
-		 </div>
-  		<div class='form-group'>
-		    <label class='col-sm-2 control-label'>Nombre Completo:</label>
-		    <div class='col-sm-10'>
-		      <input type='text' class='form-control' name='nombre' value=".$valor->nombre." required>
-		    </div>
-		 </div>
-      	  <div class='form-group'>
-		    <label for='inputEmail3' class='col-sm-2 control-label'>Email:</label>
-		    <div class='col-sm-10'>
-		      <input type='email' name='email' class='form-control' value=".$valor->email." required>
-		    </div>
-		  </div>
-		  <div class='form-group'>
-		    <label class='col-sm-2 control-label'>Tel�fono:</label>
-		    <div class='col-sm-10'>
-		      <input type='text' name='telefono' class='form-control' value=".$valor->telefono." maxlength='10' required>
-		    </div>
-		  </div>
-		  <div class='form-group'>
-		    <label class='col-sm-2 control-label'>Facebook:</label>
-		    <div class='col-sm-10'>
-		      <input type='text' name='facebook' class='form-control' placeholder='Nombre de la cuenta' required>
-		    </div>
-		  </div>
-		  <div class='form-group'>
-      		<label class='col-sm-2 control-label'>Koinonia:</label>
-		    <div class='col-sm-10' id='prueba'>".dameKoinonia(''.$valor->genero.'')."</div>
-		  </div>
-		  <div class='form-group'>
-		    <label class='col-sm-2 control-label'>Genero:</label>
-		    <div class='col-sm-10' id='setGenero'>
-		      <input type='text' name='genero' value=".$valor->genero." class='form-control' maxlength='1'>
-		    </div>
-		  </div>
-		  <div class='form-group'>
-		    <div class='col-sm-offset-2 col-sm-10'>
-		      <button type='submit' class='btn btn-default'>Inscribir</button>
-		    </div>
-		  </div></form>";
-
-
+			echo "<tr><td>".utf8_encode($em->firstname.' '.$em->lastname.' '.$em->matname)."</td>
+				<td>".utf8_encode($em->address)."</td>
+				<td>".$em->phone."</td>
+				<td>".$em->email."</td>
+				<td>".$tipo."</td>
+				<td>".utf8_encode($em->branch_name)."</td>
+				<td>".utf8_encode($em->address_branch)."</td>
+				<td><a href='#' class='editEmployee' ide = ".$em->employeeid."><span class='glyphicon glyphicon-pencil'></span> Editar</a> | 
+				    <a href='#' class='removeEmployee' ide = ".$em->employeeid."><span class='glyphicon glyphicon-trash'></span> Eliminar</a></td></tr>";
 		}
+		echo "</tbody></table>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>Sin Empleados</div>";
+	}
 }
 
 function actualizaRegistroEditado()

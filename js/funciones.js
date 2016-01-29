@@ -63,7 +63,6 @@ $(function()
         }
     });
     
-    
     $('#example tbody').on( 'click', 'tr', function () {
         if ( $(this).hasClass('selected') ) {
             $(this).removeClass('selected');

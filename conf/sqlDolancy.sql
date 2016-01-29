@@ -37,9 +37,8 @@ CREATE TABLE branch (
 	branchid INT PRIMARY KEY NOT NULL,
 	name VARCHAR(200) NOT NULL,
 	address VARCHAR(200) NOT NULL,
-	employeeid INT NOT NULL,
-	PRIMARY KEY (branchid),
-	FOREIGN KEY (employeeid) REFERENCES employee(employeeid)
+	status INT DEFAULT 1, 
+	PRIMARY KEY (branchid)
 );
 
 CREATE TABLE detail_stock (
@@ -94,7 +93,9 @@ CREATE TABLE employee (
 	phone VARCHAR(10) NOT NULL,
 	address VARCHAR(200) NOT NULL,
 	type_employee INT DEFAULT '0', -- 0 - vendedor, 1 - gerente, 2 - director
-	PRIMARY KEY (employeeid)
+	branchid INT NOT NULL,
+	PRIMARY KEY (employeeid),
+	FOREIGN KEY (branchid) REFERENCES branch(branchid)
 );
 
 CREATE TABLE user_credentials (

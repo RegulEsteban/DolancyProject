@@ -30,17 +30,16 @@ function iniciaSession(){
 					$credentials = $query->select("email, password, employeeid","user_credentials","email = '".sha1(limpiaEmail($usuario))."' and password = '".sha1(__($password))."'","","obj");
 					if(count($credentials)==1){
 						foreach ($credentials as $c){
-							$em = $query->select("employeeid, firstname, lastname, email, type_employee","employee","employeeid = '".$c->employeeid."'","","obj");
+							$em = $query->select("employeeid, firstname, lastname, email, type_employee, branchid, status","employee","employeeid = '".$c->employeeid."'","and status = 1","obj");
 							if(count($em)==1){
 								session_start();
 								$_SESSION["dolancySession"]=true;
 								foreach ($em as $u) :
-								$branchid=$query->select("branchid","branch","employeeid = $u->employeeid","","arr");
 								$_SESSION["nombre"]=$u->firstname." ".$u->lastname;
 								$_SESSION["email"]=$u->email;
 								$_SESSION["employeeid"]=$u->employeeid;
 								$_SESSION["type_usu"]=$u->type_employee;
-								$_SESSION["branchid"]=$branchid[0];
+								$_SESSION["branchid"]=$u->branchid;
 								endforeach;
 								header("Location:Bienvenido");
 							}else{

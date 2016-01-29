@@ -243,7 +243,6 @@ if(!isLogin()){
     								<input type="text" class="form-control" id="client_phone" name="client_phone" placeholder="Celular o de Casa" required>
   								</div>
 							</form>
-							<div id="errorFormClient" class="alert alert-success" role="alert" hidden="hidden"></div>
 					    </div>
 					    <div role="tabpanel" class="tab-pane fade" id="tableClient">
 					    	<table id="example" class="display" cellspacing="0" width="100%">
