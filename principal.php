@@ -240,7 +240,7 @@ if(!isLogin()){
   								</div>
   								<div class="form-group">
     								<label for="client_phone_label">Teléfono:</label>
-    								<input type="text" class="form-control" id="client_phone" name="client_phone" placeholder="Celular o de Casa" required>
+    								<input type="number" class="form-control" id="client_phone" name="client_phone" placeholder="Celular o de Casa" required>
   								</div>
 							</form>
 					    </div>
@@ -269,6 +269,7 @@ if(!isLogin()){
 	</div>
 	
 	<?php include("js.php"); ?>
+	<script src="js/funciones.js"></script>
 	
 </body>
 </html>

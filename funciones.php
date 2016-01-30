@@ -151,10 +151,10 @@ function getBranchs(){
 	$query=new Query();
 	$values = $query->select("branchid, name, address","branch","status = 1","","obj");
 	if(count($values)>0){
-		echo "<select id='branch_select' name='branch_select' class='form-control'>";
-		echo "<option value='0' selected>Seleccione una Sucursal</option>";
+		echo "<select id='employee_branch' name='employee_branch' class='form-control'>";
+		echo "<option value='' selected>Seleccione una Sucursal</option>";
 		foreach ($values as $b){
-			echo "<option value='".$b->branchid."'>".$b->name."</option>";
+			echo "<option value='".$b->branchid."'>".utf8_encode($b->name)."&nbsp; - &nbsp;&nbsp;".utf8_encode($b->address)."</option>";
 		}
 		echo "</select>";
 	}else{
@@ -297,7 +297,6 @@ function getAllEmployees(){
 						<th>Teléfono</th>
                         <th>Email</th>
                         <th>Tipo</th>
-                        <th>Sucursal</th>
 						<th>Sucursal - Dirección</th>
 						<th>Acción</th>
                 	</tr>
@@ -315,8 +314,7 @@ function getAllEmployees(){
 				<td>".$em->phone."</td>
 				<td>".$em->email."</td>
 				<td>".$tipo."</td>
-				<td>".utf8_encode($em->branch_name)."</td>
-				<td>".utf8_encode($em->address_branch)."</td>
+				<td>".utf8_encode($em->branch_name)." - ".utf8_encode($em->address_branch)."</td>
 				<td><a href='#' class='editEmployee' ide = ".$em->employeeid."><span class='glyphicon glyphicon-pencil'></span> Editar</a> | 
 				    <a href='#' class='removeEmployee' ide = ".$em->employeeid."><span class='glyphicon glyphicon-trash'></span> Eliminar</a></td></tr>";
 		}
