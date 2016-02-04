@@ -270,6 +270,34 @@ if($_POST)
     			echo json_encode($miArray);
     		}
     	}
+    }else if($_POST["saveNewEmployee"]){
+    	$name = $_POST["employee_name"];
+    	$lastname = $_POST["employee_lastname"];
+    	$matname = $_POST["employee_matname"];
+    	$email = $_POST["employee_email"];
+    	$phone = $_POST["employee_phone"];
+    	$address = $_POST["employee_address"];
+    	$type = $_POST["employee_type"];
+    	$branchid = $_POST["employee_branch"];
+    	 
+    	$query = new Query();
+    	
+    	if($query->insert("employee", "firstname, lastname, matname, email, phone, address, type_employee, branchid","'$name', '$lastname', '$matname', '$email', '$phone', '$address', $type, $branchid","")){
+    		$employee = $query->select("employeeid","employee","firstname like '$name' and lastname like '$lastname' and email like '$email' and phone like '$phone' and type_employee = $type and branchid = $branchid", "", "obj");
+    		if(count($employee)==1){
+    			foreach ($employee as $e){
+    				$miArray = array("error"=>null,"id"=>$e->employeeid);
+    				echo json_encode($miArray);
+    			}
+    		}else{
+    			$miArray = array("error"=>"Error al insertar empleado.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"Error al insertar empleado.");
+    		echo json_encode($miArray);
+    	}
+    		
     }
     
 }else if($_GET){

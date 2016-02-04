@@ -87,14 +87,32 @@ function saveEmployee(e){
 	var tabla = $("#exampleEmployee").DataTable();
 	var isValid = $('#newEmployeeForm').valid();
 	if(isValid){
-		tabla.row.add([$('#employee_name').val()+" "+$('#employee_lastname').val()+" "+$('#employee_matname').val(), 
-						$('#employee_address').val(),
-						$('#employee_phone').val(),
-						$('#employee_email').val(),
-						$('#employee_type').val(),
-						$('#employee_branch').val()])
-		               .draw();
 		
+		$.post("funcionesJSON.php", { employee_name: $('#employee_name').val(), 
+										employee_lastname: $('#employee_lastname').val(),
+										employee_matname: $('#employee_matname').val(),
+										employee_email: $('#employee_email').val(),
+										employee_phone: $('#employee_phone').val(),
+										employee_address: $('#employee_address').val(),
+										employee_type: $('#employee_type').val(),
+										employee_branch: $('#employee_branch').val(),
+										saveNewEmployee: true}, function(respuesta){
+			if(respuesta.error != null){
+				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
+				$('#myModal').modal('show');
+			}else{
+				tabla.row.add([$('#employee_name').val()+" "+$('#employee_lastname').val()+" "+$('#employee_matname').val(), 
+								$('#employee_address').val(),
+								$('#employee_phone').val(),
+								$('#employee_email').val(),
+								$('#employee_type option:selected').text(),
+								$('#employee_branch option:selected').text(),
+								"<a href='#' class='editEmployee' ide = "+respuesta.id+"><span class='glyphicon glyphicon-pencil'></span> Editar</a> | <a href='#' class='removeEmployee' ide = "+respuesta.id+"><span class='glyphicon glyphicon-trash'></span> Eliminar</a>"])
+				               .draw();
+				alert("Empleado guardado.")
+				validator.resetForm();
+			}
+		}, 'json');
 	}else{
 		return false;
 	}
