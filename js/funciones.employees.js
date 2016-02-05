@@ -82,6 +82,7 @@ $(function()
 });
 
 $(document).on('click', "#saveEmployee", saveEmployee);
+$(document).on('click', ".removeEmployee", removeEmployee);
 
 function saveEmployee(e){
 	var tabla = $("#exampleEmployee").DataTable();
@@ -116,4 +117,12 @@ function saveEmployee(e){
 	}else{
 		return false;
 	}
+}
+
+function removeEmployee(e){
+	if (confirm('\u00BF'+"Seguro que desea eliminar el empleado?"))
+    {
+		var id = $(e.target).attr('ide');
+		alert("click :D"+id);
+    }
 }

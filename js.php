@@ -6,3 +6,6 @@
 <script src="dataTable/js/jquery.dataTables.js" ></script>
 <script src="dataTable/js/jquery.dataTables.min.js" ></script>
 <script src="js/jquery.validate.js"></script>
+<script src="webcodecamjs-master/js/qrcodelib.js"></script>
+<script src="webcodecamjs-master/js/webcodecamjquery.js"></script>
+<script src="webcodecamjs-master/js/mainjquery.js"></script>

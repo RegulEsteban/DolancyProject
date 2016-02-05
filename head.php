@@ -13,6 +13,7 @@
 <link href="css/prettyPhoto.css" rel="stylesheet">
 <link href="css/animate.css" rel="stylesheet">
 <link href="css/main.css" rel="stylesheet">
+<link href="css/qr.style.css" rel="stylesheet">
 <link href="dataTable/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
 <link href="dataTable/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
 <link href="dataTable/css/jquery.dataTables_themeroller.css" rel="stylesheet" type="text/css">
