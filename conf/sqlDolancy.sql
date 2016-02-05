@@ -125,14 +125,18 @@ CREATE TABLE order_shoe (
 CREATE TABLE transition_shoe_log(
 	transitionid INT PRIMARY KEY NOT NULL,
 	branch_destination_id INT NOT NULL,
+	branch_origin_id INT NOT NULL,
 	stockid INT NOT NULL,
 	date_transition_up TIMESTAMP NOT NULL,
 	date_transition_down TIMESTAMP NOT NULL,
-	employeeid INT NOT NULL,
+	employeeid_receiber INT NOT NULL,
+	employeeid_sender INT NOT NULL
 	PRIMARY KEY (transitionid),
 	FOREIGN KEY (stockid) REFERENCES detail_stock(stockid),
-	FOREIGN KEY (employeeid) REFERENCES employee(employeeid),
-	FOREIGN KEY (branch_destination_id) REFERENCES branch(branchid)
+	FOREIGN KEY (employeeid_receiber) REFERENCES employee(employeeid),
+	FOREIGN KEY (employeeid_sender) REFERENCES employee(employeeid),
+	FOREIGN KEY (branch_destination_id) REFERENCES branch(branchid),
+	FOREIGN KEY (branch_origin_id) REFERENCES branch(branchid)
 );
 
 CREATE TABLE cash_discount(

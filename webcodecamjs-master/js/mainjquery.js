@@ -11,11 +11,13 @@
         decodeLocal = $("#decode-img"),
         play = $("#play"),
         playSearch = $("#search-shoe-qr"),
+        playAddList = $("#add-list-shoe-qr"),
         scannedImg = $("#scanned-img"),
         scannedQR = $("#scanned-QR"),
         grabImg = $("#grab-img"),
         pause = $("#pause"),
         stop = $("#stop"),
+        stopQR = $(".stop-qr"),
         contrast = $("#contrast"),
         contrastValue = $("#contrast-value"),
         zoom = $("#zoom"),
@@ -31,7 +33,12 @@
         flipVertical = $("#flipVertical"),
         flipVerticalValue = $("#flipVertical-value"),
         flipHorizontal = $("#flipHorizontal"),
-        flipHorizontalValue = $("#flipHorizontal-value");
+        flipHorizontalValue = $("#flipHorizontal-value"),
+        
+        typeModalQR = $("#typeModalQR"),
+        model_select = $("#model_select"),
+        color_select = $("#color_select"),
+        size_select = $("#size_select");
     var args = {
         autoBrightnessValue: 100,
         resultFunction: function(res) {
@@ -41,7 +48,49 @@
                 });
             });
             scannedImg.attr("src", res.imgData);
-            scannedQR.text(res.format + ": " + res.code);
+            scannedQR.text(res.format + ": " + res.code+" | "+typeModalQR.val());
+            if(typeModalQR.val()==="S-QR"){
+            	$.post("funcionesJSON.php", {model: model_select.val(), color: color_select.val(), size: size_select.val()}, function(respuesta) {
+            		if (respuesta === "null")
+            		{
+            			$("#search_shoe_result").html("<div class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>");
+            		} else {
+            			$("#search_shoe_result").html("<table class='table table-striped'><thead><tr>"+
+                                    	"<th>Modelo</th>"+
+                                    	"<th>Talla</th>"+
+                                    	"<th>Color</th>"+
+                                    	"<th>Precio</th>"+
+                                    	"<th>Sucursal</th>"+
+                                    	"<th>Agregar</th>"+
+                                    	"</tr></thead><tbody>"+respuesta+"</tbody></table>");
+            		}
+            	},'json');
+            }else if(typeModalQR.val()==="AL-QR"){
+            	var stockid = 3; //res.code
+            	var saleid = $("#idTableSaleList").attr("saleid");
+            	var row = $(this).parents('tr')[0];
+            	$.post("funcionesJSON.php", {stockid: stockid, saleid: saleid, addShoe: true}, function(respuesta){
+            		if(respuesta.error != null){
+            			$("#modalTitle").html("<span class='glyphicon glyphicon-warning-sing'></span> "+respuesta.error);
+            			$('#myModal').modal('show');
+            		}else{
+            			$("#noResultSaleList").hide();
+            			$("#idTableSaleList").attr("saleid", respuesta.saleid);
+            			$('#idTableSaleList tbody').append('<tr><td>'+respuesta.model+
+            					'</td><td>'+respuesta.size+
+            					'</td><td>'+respuesta.color+
+            					'</td><td>'+respuesta.price+
+            					'</td><td><a href="#" class="removeShoeSaleList" stockid="'+respuesta.stockid+'"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td>'+
+            					'<td><a href="#" class="applyDiscount" stockidApply="'+respuesta.stockid+'"><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>'+
+            					'</tr>');
+            			row.remove();
+            		}
+            	}, 'json');
+            	/** queda este bug pendiente **/
+            	stopQR.trigger('click');
+            	$('#qr').modal('hide');
+            	
+            }
         },
         getDevicesError: function(error) {
             var p, message = "Error detected with the following parameters:\n";
@@ -91,6 +140,11 @@
         grabImg.removeClass("disabled");
         decoder.play();
     });
+    playAddList.on("click", function() {
+        scannedQR.text("Scanning ...");
+        grabImg.removeClass("disabled");
+        decoder.play();
+    });
     grabImg.on("click", function() {
         scannedImg.attr("src", decoder.getLastImageSrc());
     });
@@ -99,6 +153,16 @@
         decoder.pause();
     });
     stop.on("click", function(event) {
+        grabImg.addClass("disabled");
+        scannedQR.text("Stopped");
+        decoder.stop();
+    });
+//    stopQR.on("click", function(event) {
+//        grabImg.addClass("disabled");
+//        scannedQR.text("Stopped");
+//        decoder.stop();
+//    });
+    stopQR.click(function(event) {
         grabImg.addClass("disabled");
         scannedQR.text("Stopped");
         decoder.stop();

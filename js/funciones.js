@@ -110,6 +110,7 @@ $(document).on('mousedown', ".viewDiscount", viewDiscount);
 $(document).on('click', "#applicateDiscount", applicateDiscount);
 $(document).on('click', "#saveClient", saveClient);
 $(document).on('click', "#search-shoe-qr", searchShoeQr);
+$(document).on('click', "#add-list-shoe-qr", addListShoeQr);
 
 function removeShoe(event){
 	var row = $(this).parents('tr')[0];
@@ -317,4 +318,9 @@ function applicateDiscount(e){
 function searchShoeQr(e){
 	$('#qr').modal('show');
 	$('input#typeModalQR').val("S-QR");
+}
+
+function addListShoeQr(e){
+	$('#qr').modal('show');
+	$('input#typeModalQR').val("AL-QR");
 }
