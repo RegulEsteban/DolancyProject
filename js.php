@@ -9,3 +9,4 @@
 <script src="webcodecamjs-master/js/qrcodelib.js"></script>
 <script src="webcodecamjs-master/js/webcodecamjquery.js"></script>
 <script src="webcodecamjs-master/js/mainjquery.js"></script>
+<script src="noty-2.3.8/js/noty/packaged/jquery.noty.packaged.js"></script>

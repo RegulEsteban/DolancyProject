@@ -88,7 +88,6 @@ function saveEmployee(e){
 	var tabla = $("#exampleEmployee").DataTable();
 	var isValid = $('#newEmployeeForm').valid();
 	if(isValid){
-		
 		$.post("funcionesJSON.php", { employee_name: $('#employee_name').val(), 
 										employee_lastname: $('#employee_lastname').val(),
 										employee_matname: $('#employee_matname').val(),
@@ -99,8 +98,7 @@ function saveEmployee(e){
 										employee_branch: $('#employee_branch').val(),
 										saveNewEmployee: true}, function(respuesta){
 			if(respuesta.error != null){
-				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-				$('#myModal').modal('show');
+				notificacionError(respuesta.error);
 			}else{
 				tabla.row.add([$('#employee_name').val()+" "+$('#employee_lastname').val()+" "+$('#employee_matname').val(), 
 								$('#employee_address').val(),
@@ -110,7 +108,7 @@ function saveEmployee(e){
 								$('#employee_branch option:selected').text(),
 								"<a href='#' class='editEmployee' ide = "+respuesta.id+"><span class='glyphicon glyphicon-pencil'></span> Editar</a> | <a href='#' class='removeEmployee' ide = "+respuesta.id+"><span class='glyphicon glyphicon-trash'></span> Eliminar</a>"])
 				               .draw();
-				alert("Empleado guardado.")
+				notificacionSuccess("Empleado guardado.");
 				validator.resetForm();
 			}
 		}, 'json');
@@ -120,9 +118,56 @@ function saveEmployee(e){
 }
 
 function removeEmployee(e){
-	if (confirm('\u00BF'+"Seguro que desea eliminar el empleado?"))
-    {
-		var id = $(e.target).attr('ide');
-		alert("click :D"+id);
-    }
+	var row = $(this).parents('tr')[0];
+	var id = $(e.target).attr('ide');
+	var tabla = $("#exampleEmployee").DataTable();
+	var n = noty({
+        text        : '<span class="glyphicon glyphicon-trash"></span> ¿Seguro(a) que desea eliminar?',
+        type        : 'alert',
+        dismissQueue: true,
+        layout      : 'center',
+        modal		: true,
+        theme       : 'defaultTheme',
+        buttons     : [
+            {addClass: 'btn btn-primary', text: 'Aceptar', onClick: function ($noty) {
+            	$.post("funcionesJSON.php", { employeeid: id, removeEmployee: true}, function(respuesta){
+        			if(respuesta.error != null){
+        				notificacionError(respuesta.error);
+        			}else{
+        				tabla.row(row).remove().draw();
+        			}
+        		}, 'json');
+                $noty.close();
+            }
+            },
+            {addClass: 'btn btn-danger', text: 'Cancelar', onClick: function ($noty) {
+            		$noty.close();
+            	}
+            }
+        ]
+    });
+}
+
+function notificacionError(texto){
+	var n = noty({
+        text        : "<span class='glyphicon glyphicon-thumbs-down'></span> "+texto,
+        type        : 'alert',
+        dismissQueue: true,
+        layout      : 'top',
+        theme       : 'defaultTheme',
+        type		: 'error',
+        timeout     : 8000
+    });
+}
+
+function notificacionSuccess(texto){
+	var n = noty({
+        text        : "<br><span class='glyphicon glyphicon-ok'></span> "+texto,
+        type        : 'alert',
+        dismissQueue: true,
+        layout      : 'top',
+        theme       : 'defaultTheme',
+        type		: 'success',
+        timeout     : 8000
+    });
 }

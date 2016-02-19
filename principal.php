@@ -42,9 +42,20 @@ if(!isLogin()){
     		</div>
     		<div class="col-xs-4">
 	    		<div class="panel panel-warning">
+	    			<div class="panel-heading"><span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span> Herramientas</div>
 	  				<div class="panel-body">
-						<p>Ver lista de ventas de hoy</p>
-	    				<a target="_self" href="#" class="btn btn-primary btn-lg"><i class="icon-list icon-small"></i> Lista de hoy</a>
+						<button type="button" class="btn btn-warning btn-lg btn-block">
+							<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+							<span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+							<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+							 Transacciones
+						</button>
+						<button type="button" class="btn btn-warning btn-lg btn-block">
+							<span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Lista
+						</button>
+						<button type="button" class="btn btn-warning btn-lg btn-block">
+							<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Discounts
+						</button>
 	  				</div>
 				</div>
     		</div>
@@ -58,74 +69,61 @@ if(!isLogin()){
     		</div>
     	</div>
     	<div class="row">
-    		<div class="col-xs-6">
-	    		<div class="panel panel-warning">
-    				<div class="panel-heading">Resultados de Búsqueda</div>
-    				<div id="search_shoe_result" class="panel-body">
-    					<?php 
-    					getShoes(getBranchId()) 
-    					?>
-    				</div>
-  				</div>
-    		</div>
-    		<div class="col-xs-6">
-    			<div class="panel panel-warning">
-    				<div class='panel-heading'>
-						<p>
-							Listas de Venta
-							<button type="button" id="add-list-shoe-qr" class="btn btn-success pull-right"><i class='icon-qrcode icon-small'></i> Escanear QR</button>
-							<button type="button" id="realizaVenta" class="btn btn-primary pull-right" ><span class='glyphicon glyphicon-new-window'></span> Realizar</button>						
-						</p>
-    				</div>
-    				<div class='panel-body'>
-    					<?php 
-    					if(existSaleList(getUsuId())==0){
-    						getSaleList(getUsuId());
-    					}
-						?>
-    					<table id="idTableSaleList" saleid="<?php echo existSaleList(getUsuId()) ?>" class="table table-striped">
-	                    	<thead>
-	                        	<tr>
-	                            	<th>Modelo</th>
-	                            	<th>Talla</th>
-	                            	<th>Color</th>
-	                            	<th>Precio</th>
-	                            	<th>Acción</th>
-	                            	<th>Adicional</th>
-	                        	</tr>
-	                    	</thead>
-	        				<tbody>
-	        					<?php 
-		    					if(existSaleList(getUsuId())>0){
-		    						getSaleList(getUsuId());
-		    					}
-								?>
-	        				</tbody>
-        				</table>
-    				</div>
-  				</div>
+    		<div class="col-xs-12">
+    			<ul class="nav nav-tabs nav-justified" id="tablasProductos">
+				  	<li role="presentation" class="active" id="busquedaProductosTab"><a href="#busquedaProductos" aria-controls="busquedaProductos" role="tab" data-toggle="tab">Productos</a></li>
+				  	<li role="presentation" id="listaVentasTab"><a href="#listaVentas" aria-controls="listaVentas" role="tab" data-toggle="tab">Lista de Venta</a></li>
+				</ul>
+    			<div class="tab-content">
+		    		<div id="busquedaProductos" class="panel panel-warning tab-pane fade in active" role="tabpanel">
+	    				<div class="panel-heading">Resultados de Búsqueda</div>
+	    				<div id="search_shoe_result" class="panel-body">
+	    					<?php 
+	    					getShoes(getBranchId()) 
+	    					?>
+	    				</div>
+	  				</div>
+	    			<div id="listaVentas" class="panel panel-warning tab-pane fade" role="tabpanel">
+	    				<div class='panel-heading'>
+							<p>
+								Lista de Venta
+								<button type="button" id="add-list-shoe-qr" class="btn btn-success pull-right"><i class='icon-qrcode icon-small'></i> Escanear QR</button>
+								<button type="button" id="realizaVenta" class="btn btn-primary pull-right" ><span class='glyphicon glyphicon-new-window'></span> Realizar</button>						
+							</p>
+	    				</div>
+	    				<div class='panel-body'>
+	    					<?php 
+	    					if(existSaleList(getUsuId())==0){
+	    						getSaleList(getUsuId());
+	    					}
+							?>
+	    					<table id="idTableSaleList" saleid="<?php echo existSaleList(getUsuId()) ?>" class="table table-striped">
+		                    	<thead>
+		                        	<tr>
+		                            	<th>Modelo</th>
+		                            	<th>Talla</th>
+		                            	<th>Color</th>
+		                            	<th>Precio</th>
+		                            	<th>Acción</th>
+		                            	<th>Adicional</th>
+		                        	</tr>
+		                    	</thead>
+		        				<tbody>
+		        					<?php 
+			    					if(existSaleList(getUsuId())>0){
+			    						getSaleList(getUsuId());
+			    					}
+									?>
+		        				</tbody>
+	        				</table>
+	    				</div>
+	  				</div>
+	  			</div>
     		</div>
     	</div>
     </div>
 
     <?php include("footer.php"); ?>
-	
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  		<div class="modal-dialog" role="document">
-    		<div class="modal-content">
-      			<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        			<h4 class="modal-title">Error</h4>
-      			</div>
-      			<div class="modal-body">
-        			<div id="modalTitle" class='alert alizarin' role='alert'>...</div>
-      			</div>
-      			<div class="modal-footer">
-        			<button type="button" class="btn btn-default" data-dismiss="modal">Aceptar</button>
-      			</div>
-    		</div>
-  		</div>
-	</div>
 	
 	<div class="modal fade" id="modalSale" tabindex="-1" role="dialog" aria-labelledby="ModalSale">
   		<div class="modal-dialog modal-lg" role="document">

@@ -265,6 +265,7 @@ function getShoes($branchid){
 				<th>Precio</th>
 				<th>Sucursal</th>
 				<th>Agregar</th>
+				<th>Acción</th>
 				</tr></thead><tbody>";
 		foreach ($stocks as $stock){
 			echo '<tr>
@@ -274,9 +275,11 @@ function getShoes($branchid){
                   	<td class="viewDiscount">'.$stock->price.'</td>
                   	<td><code>'.$stock->branch_name.'</code> <i class="icon-home icon-small"></i> '.$stock->branch_address.'</td>';
 			if($stock->status==1){
-				echo '<td><i class="icon-frown icon-small"></i> No disponible</td>';
+				echo '<td><i class="icon-frown icon-small"></i> No disponible</td>
+					  <td><i class="icon-frown icon-small"></i> No disponible</td>';
 			}else{
-				echo '<td><a href="#" class="addShoeList" stockid='.$stock->id.'><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>';
+				echo '<td><a href="#" class="addShoeList" stockid='.$stock->id.'><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>
+					  <td><a role="button" stockid='.$stock->id.' data-loading-text="Importando..." class="btn btn-primary btn-sm orderImport" disabled="disabled"><span class="glyphicon glyphicon-import"></span> Importar</a></td>';
 			}
 			echo '</tr>';
 		}

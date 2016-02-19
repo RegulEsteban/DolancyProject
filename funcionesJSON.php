@@ -5,6 +5,7 @@ include './funciones.php';
 if($_POST)
 {
     include_once './conf/query.inc';
+    include_once './funcionesLogin.php';
     //buscar zapato por atributos
     if($_POST["model"]!=null && $_POST["color"]!=null && $_POST["size"]!=null){
     	$modelid = $_POST["model"];
@@ -23,7 +24,7 @@ if($_POST)
     	}
     	
     	$query = new query();
-    	$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address, s.status",
+    	$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address, b.branchid, s.status",
     					"detail_stock s
 						join shoe on s.shoeid = shoe.shoeid
 						join model m on m.modelid = shoe.modelid
@@ -35,6 +36,7 @@ if($_POST)
     	if(count($stocks)>0){
     		$result = "";
     		foreach ($stocks as $stock){
+    			$transacciones = $query->select("stockid","transition_shoe_log","stockid = $stock->id","","obj");
     			$result=$result.'<tr>
                   		<td>'.$stock->model.'</td>
                   		<td>'.$stock->size.'</td>
@@ -43,8 +45,17 @@ if($_POST)
                   		<td><code>'.$stock->branch_name.'</code> <i class="icon-home icon-small"></i> '.$stock->branch_address.'</td>';
     			if($stock->status==1){
     				$result=$result.'<td><i class="icon-frown icon-small"></i> No disponible</td>';
+    				$result=$result.'<td><i class="icon-frown icon-small"></i> No disponible</td>';
+    			}else if(count($transacciones)>0){
+    				$result=$result.'<td><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Importando...</td>';
+    				$result=$result.'<td><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Importando...</td>';
     			}else{
     				$result=$result.'<td><a href="#" class="addShoeList" stockid='.$stock->id.'><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>';
+    				if(getBranchId()==$stock->branchid){
+    					$result=$result.'<td><a role="button" stockid='.$stock->id.' data-loading-text="Importando..." class="btn btn-primary btn-sm orderImport" disabled="disabled"><span class="glyphicon glyphicon-import"></span> Importar</a></td>';
+    				}else{
+    					$result=$result.'<td><a role="button" stockid='.$stock->id.' branchid='.$stock->branchid.' data-loading-text="Importando..." class="btn btn-primary btn-sm orderImport" autocomplete="off"><span class="glyphicon glyphicon-import"></span> Importar</a></td>';
+    				}
     			}
     			$result=$result.'</tr>';
     		}
@@ -56,7 +67,6 @@ if($_POST)
     	$stockid = $_POST["stockid"];
     	$saleid = $_POST["saleid"];
 	
-    	include_once './funcionesLogin.php';
     	$query = new Query();
     	
     	$stockBranch = $query->select("branchid","detail_stock","stockid = $stockid","","arr");
@@ -303,6 +313,31 @@ if($_POST)
     		echo json_encode($miArray);
     	}
     		
+    }else if($_POST["transactionShoe"]){
+    	$stockid=$_POST["stockid"];
+    	$branchidOrigin = $_POST["branchid"];
+    	$branchidDestination = getBranchId();
+    	$employeeid = getUsuId();
+    	
+    	$query = new Query();
+    	if(!$query->insert("transition_shoe_log", "branch_destination_id, branch_origin_id, stockid, date_transition_down, employeeid_sender", "$branchidDestination, $branchidOrigin, $stockid, NOW(), $employeeid","")){
+    		$miArray = array("error"=>"No se pudo registrar la transacción.");
+    		echo json_encode($miArray);
+    	}else{
+    		$miArray = array("respuesta"=>"ok");
+    		echo json_encode($miArray);
+    	}
+    }else if($_POST["removeEmployee"]){
+    	$employeeid = $_POST["employeeid"];
+    	
+    	$query = new Query();
+    	if(!$query->update("employee", "status = 0", "employeeid = $employeeid","")){
+    		$miArray = array("error"=>"No se pudo eliminar empleado.");
+    		echo json_encode($miArray);
+    	}else{
+    		$miArray = array("respuesta"=>"ok");
+    		echo json_encode($miArray);
+    	}
     }
     
 }else if($_GET){

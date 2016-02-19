@@ -33,6 +33,7 @@ $(function()
 	var model_select = document.getElementById("model_select");
 	
     $("#search_shoe").click(function(event){
+    	$('#tablasProductos a:first').tab('show');
     	$.post("funcionesJSON.php", {model: model_select.value, color: color_select.value, size: size_select.value}, function(respuesta) {
     		if (respuesta === "null")
     		{
@@ -45,6 +46,7 @@ $(function()
                             	"<th>Precio</th>"+
                             	"<th>Sucursal</th>"+
                             	"<th>Agregar</th>"+
+                            	"<th>Acción</th>"+
                             	"</tr></thead><tbody>"+respuesta+"</tbody></table>");
     		}
       },'json');
@@ -111,6 +113,7 @@ $(document).on('click', "#applicateDiscount", applicateDiscount);
 $(document).on('click', "#saveClient", saveClient);
 $(document).on('click', "#search-shoe-qr", searchShoeQr);
 $(document).on('click', "#add-list-shoe-qr", addListShoeQr);
+$(document).on('click', ".orderImport", orderImport);
 
 function removeShoe(event){
 	var row = $(this).parents('tr')[0];
@@ -134,8 +137,7 @@ function addShoe(event){
 	var row = $(this).parents('tr')[0];
 	$.post("funcionesJSON.php", {stockid: stockid, saleid: saleid, addShoe: true}, function(respuesta){
 		if(respuesta.error != null){
-			$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-			$('#myModal').modal('show');
+			notificacionError(respuesta.error);
 		}else{
 			$("#noResultSaleList").hide();
 			$("#idTableSaleList").attr("saleid", respuesta.saleid);
@@ -165,8 +167,7 @@ function saveClient(e){
 										client_phone: $('#client_phone').val(),
 										saleid: saleid, saveNewClient: true}, function(respuesta){
 				if(respuesta.error != null){
-					$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-					$('#myModal').modal('show');
+					notificacionError(respuesta.error);
 				}else{
 					$('#clientModal').modal('hide');
 					$('#datosCliente').html("<i class='icon-user icon-small'></i> Nombre: "+$('#client_name').val()+" "+$('#client_lastname').val()+" "+$('#client_matname').val()+"<br/>" +
@@ -180,18 +181,16 @@ function saveClient(e){
 		}
 	}else if(tabActive === 'tableClientTab'){
 		if(tabla.row('.selected').data() === undefined){
-			alert("Debe seleccionar un cliente para realizar la venta.");
+			notificacionError("Debe seleccionar un cliente para realizar la venta.");
 		}else{
 			var clientid = tabla.row('.selected').data()[0];
 			
 			if(saleid===null || saleid===undefined || saleid==='0'){
-				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> Error!!! No existe venta. Favor de llamar a su administrador.");
-				$('#myModal').modal('show');
+				notificacionError("No existe venta. Favor de llamar a su administrador.");
 			}else{
 				$.post("funcionesJSON.php", { clientid: clientid, saleid: saleid, saveClient: true}, function(respuesta){
 					if(respuesta.error != null){
-						$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-						$('#myModal').modal('show');
+						notificacionError(respuesta.error);
 					}else{
 						$('#clientModal').modal('hide');
 						$('#datosCliente').html("<i class='icon-user icon-small'></i> Nombre: "+tabla.row('.selected').data()[1]+"<br/>" +
@@ -217,8 +216,7 @@ function showSaleList(e){
 	}else{
 		$.post("funcionesJSON.php", { saleid: saleid, getSale: true}, function(respuesta){
 			if(respuesta.error != null){
-				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-				$('#myModal').modal('show');
+				notificacionError(respuesta.error);
 			}else{
 				$('#getSaleTable tbody').html(respuesta.resultado);
 				$("#totalComponent").html(respuesta.total);
@@ -234,11 +232,11 @@ function realizaVenta(e){
 	
 	$.post("funcionesJSON.php", { getClients: true }, function(respuesta){
 		if(respuesta.error != null){
-			$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-			$('#myModal').modal('show');
+			notificacionError(respuesta.error);
 		}else{
 			var res = respuesta.resultado;
 			for( var index in res){
+				if(index != 'remove')
 				tabla.row.add([res[index].clientid, 
 				               res[index].firstname+' '+res[index].lastname+' '+res[index].matname, 
 				               res[index].email, 
@@ -303,13 +301,11 @@ function applicateDiscount(e){
 	var detail_sale_id = $("#discount_select").attr("stockToDiscount");
 	
 	if(discountid==='0'){
-		$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span>Debe de seleccionar al menos una opción de descuento.");
-		$('#myModal').modal('show');
+		notificacionError("Debe de seleccionar al menos una opción de descuento.");
 	}else{
 		$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, discountid: discountid, appDiscount: true}, function(respuesta){
 			if(respuesta.error != null){
-				$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> "+respuesta.error);
-				$('#myModal').modal('show');
+				notificacionError(respuesta.error);
 			}
 		}, 'json');
 	}
@@ -323,4 +319,48 @@ function searchShoeQr(e){
 function addListShoeQr(e){
 	$('#qr').modal('show');
 	$('input#typeModalQR').val("AL-QR");
+}
+
+function orderImport(e){
+	var stockid = $(event.target).attr("stockid");
+	var branchid = $(event.target).attr("branchid");
+	var $btn = $(this).button('loading');
+	var n = noty({
+        text        : '¿Seguro(a) que desea importar?',
+        type        : 'alert',
+        dismissQueue: true,
+        layout      : 'center',
+        modal		: true,
+        theme       : 'defaultTheme',
+        buttons     : [
+            {addClass: 'btn btn-primary', text: 'Aceptar', onClick: function ($noty) {
+	            	$.post("funcionesJSON.php", { stockid: stockid, branchid: branchid, transactionShoe: true}, function(respuesta){
+	        			if(respuesta.error != null){
+	        				notificacionError(respuesta.error);
+	        			}
+	        		}, 'json');
+            	
+            	
+                	$noty.close();
+            	}
+            },
+            {addClass: 'btn btn-danger', text: 'Cancelar', onClick: function ($noty) {
+            		$btn.button('reset');
+            		$noty.close();
+            	}
+            }
+        ]
+    });
+}
+
+function notificacionError(texto){
+	var n = noty({
+        text        : "<span class='glyphicon glyphicon-thumbs-down'></span> "+texto,
+        type        : 'alert',
+        dismissQueue: true,
+        layout      : 'top',
+        theme       : 'defaultTheme',
+        type		: 'error',
+        timeout     : 8000
+    });
 }

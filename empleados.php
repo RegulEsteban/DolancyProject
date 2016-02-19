@@ -19,9 +19,11 @@ if(!isLogin()){
     <div class="container-fluid">
     	<div class="row">
     		<div class="col-md-12">
-    			<div class="panel panel-primary">
+    			<div class="panel panel-default">
+    				<div class="panel-heading">
+    					<h1>Empleados</h1>
+    				</div>
 	  				<div class="panel-body">
-	  				
 	  					<ul class="nav nav-tabs nav-justified" id="sampleTabs">
 						  	<li role="presentation" class="active" id="newEmployeeTab"><a href="#newEmployee" aria-controls="newEmployee" role="tab" data-toggle="tab">Nuevo</a></li>
 						  	<li role="presentation" id="tableEmployeeTab"><a href="#tableEmployee" aria-controls="tableEmployee" role="tab" data-toggle="tab">Seleccionar</a></li>
