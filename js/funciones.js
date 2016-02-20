@@ -114,6 +114,8 @@ $(document).on('click', "#saveClient", saveClient);
 $(document).on('click', "#search-shoe-qr", searchShoeQr);
 $(document).on('click', "#add-list-shoe-qr", addListShoeQr);
 $(document).on('click', ".orderImport", orderImport);
+$(document).on('click', "#transactionsButton", transactionsButton);
+$(document).on('click', ".receiveStock", receiveStock);
 
 function removeShoe(event){
 	var row = $(this).parents('tr')[0];
@@ -351,6 +353,23 @@ function orderImport(e){
             }
         ]
     });
+}
+
+function transactionsButton(e){
+	$("#transactionsList tbody").empty();
+	
+	$.post("funcionesJSON.php", {getTransactions: true}, function(respuesta){
+		if(respuesta.error != null){
+			notificacionError(respuesta.error);
+		}else{
+			$('#modalTransactions').modal('show');
+			$('#transactionsList tbody').append(respuesta.respuesta);
+		}
+	}, 'json');
+}
+
+function receiveStock(e){
+	notificacionError(":D");
 }
 
 function notificacionError(texto){

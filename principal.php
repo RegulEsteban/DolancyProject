@@ -44,7 +44,7 @@ if(!isLogin()){
 	    		<div class="panel panel-warning">
 	    			<div class="panel-heading"><span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span> Herramientas</div>
 	  				<div class="panel-body">
-						<button type="button" class="btn btn-warning btn-lg btn-block">
+						<button type="button" id="transactionsButton" class="btn btn-warning btn-lg btn-block">
 							<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
 							<span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
 							<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
@@ -306,6 +306,41 @@ if(!isLogin()){
       			<div class="modal-footer">
       				<button type="button" class="btn btn-danger stop-qr" data-dismiss="modal">Cancelar</button>
         			<button type="button" class="btn btn-primary stop-qr" data-dismiss="modal">Aceptar</button>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+	
+	<div class="modal fade" id="modalTransactions" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  		<div class="modal-dialog modal-xlg" role="document">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        			<h4 class="modal-title">Transacciones</h4>
+      			</div>
+      			<div class="modal-body">
+					<table id="transactionsList" class="table table-striped">
+	                    <thead>
+	                        <tr>
+	                        	<th>Modelo</th>
+	                        	<th>Color</th>
+	                        	<th>Talla</th>
+	                        	<th>Fecha de salida</th>
+	                        	<th>Sucursal de Origen</th>
+	                            <th>Sucursal de Destino</th>
+	                            <th>Petición</th>
+	                            <th>Envió</th>
+	                            <th>Transportador</th>
+	                            <th>Recibió</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                    </tbody>
+	            	</table>			            	
+      			</div>
+      			<div class="modal-footer">
+      				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+        			<button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
       			</div>
     		</div>
   		</div>

@@ -320,7 +320,7 @@ if($_POST)
     	$employeeid = getUsuId();
     	
     	$query = new Query();
-    	if(!$query->insert("transition_shoe_log", "branch_destination_id, branch_origin_id, stockid, date_transition_down, employeeid_sender", "$branchidDestination, $branchidOrigin, $stockid, NOW(), $employeeid","")){
+    	if(!$query->insert("transition_shoe_log", "branch_destination_id, branch_origin_id, stockid, date_transition_down, employeeid_order", "$branchidDestination, $branchidOrigin, $stockid, NOW(), $employeeid","")){
     		$miArray = array("error"=>"No se pudo registrar la transacción.");
     		echo json_encode($miArray);
     	}else{
@@ -338,6 +338,75 @@ if($_POST)
     		$miArray = array("respuesta"=>"ok");
     		echo json_encode($miArray);
     	}
+    }else if($_POST["getTransactions"]){
+    	$employeeid = getUsuId();
+    	$branchid = getBranchId();
+    	$res = "";
+    	
+    	$query = new Query();
+    	$transacciones = $query->select("transitionid, t.date_transition_down, employeeid_sender, 
+    									t.date_transition_up, employeeid_transporter, employeeid_receiber,
+    									concat(eo.firstname,' ',eo.lastname,' ',eo.matname) as employee_order, 
+    									concat(bo.name,' ',bo.address) as branch_origin, 
+    									concat(bd.name,' ',bd.address) as branch_destination, 
+    									m.title as model, c.title as color, sz.size, s.stockid",
+    			"transition_shoe_log t
+				join employee eo on t.employeeid_order = eo.employeeid
+				join branch bo on t.branch_origin_id = bo.branchid 
+				join branch bd on t.branch_destination_id = bd.branchid
+				join detail_stock s on t.stockid = s.stockid
+				join shoe sh on s.shoeid = sh.shoeid
+				join model m on sh.modelid = m.modelid
+				join color c on sh.colorid = c.colorid
+				join sizes sz on sh.sizesid = sz.sizesid",
+				"","","obj");
+    	
+    	if(count($transacciones)>0){
+    		foreach ($transacciones as $t){
+    			$e_transporter = "Sin confirmar";
+    			$e_sender = "Sin confirmar";
+    			if($t->employeeid_transporter!=null){
+    				$e_transporter_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_transporter","","arr");
+    				$e_transporter = $e_transporter_tmp[0];
+    			}
+    			if($t->employeeid_sender!=null){
+    				$e_sender_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_sender","","arr");
+    				$e_sender = $e_sender_tmp[0];
+    			}
+    			if($t->employeeid_receiber!=null){
+    				$e_receiver_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_receiber","","arr");
+    				$e_receiver = $e_receiver_tmp[0];
+    			}
+    			$res=$res."<tr>
+    					<td>".$t->model."</td>
+    					<td>".$t->color."</td>
+    					<td>".$t->size."</td>
+    					<td>".utf8_encode($t->branch_origin)."</td>
+    					<td>".$t->date_transition_down."</td>
+    					<td>".utf8_encode($e_sender)."</td>
+    					<td>".utf8_encode($e_transporter)."</td>";
+    			
+    			if($t->branch_destination_id == $branchid && $t->employeeid_order == $employeeid){
+    				
+    			}
+    				
+	    		if($t->employeeid_receiber != null){
+	    			$res = $res."<td>".utf8_encode($e_receiver)."</td>";
+	    		}else if($t->employeeid_sender == null || $t->employeeid_transporter == null){
+	    			$res = $res."<td></td>";
+	    		}else{
+	    			$res = $res."<td><a href='#' class='receiveStock' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Recibir</a></td>";
+	    		}
+    			
+	    		$res = $res."</tr>";
+    		}
+    		$miArray = array("respuesta"=>$res);
+    		echo json_encode($miArray);
+    	}else{
+    		$miArray = array("error"=>"No existen transacciones en este momento.");
+    		echo json_encode($miArray);
+    	}
+    	
     }
     
 }else if($_GET){
