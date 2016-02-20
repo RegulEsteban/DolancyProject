@@ -346,9 +346,9 @@ if($_POST)
     	$query = new Query();
     	$transacciones = $query->select("transitionid, t.date_transition_down, employeeid_sender, 
     									t.date_transition_up, employeeid_transporter, employeeid_receiber,
-    									concat(eo.firstname,' ',eo.lastname,' ',eo.matname) as employee_order, 
+    									concat(eo.firstname,' ',eo.lastname,' ',eo.matname) as employee_order, employeeid_order, 
     									concat(bo.name,' ',bo.address) as branch_origin, 
-    									concat(bd.name,' ',bd.address) as branch_destination, 
+    									concat(bd.name,' ',bd.address) as branch_destination, branch_destination_id,
     									m.title as model, c.title as color, sz.size, s.stockid",
     			"transition_shoe_log t
 				join employee eo on t.employeeid_order = eo.employeeid
@@ -359,7 +359,7 @@ if($_POST)
 				join model m on sh.modelid = m.modelid
 				join color c on sh.colorid = c.colorid
 				join sizes sz on sh.sizesid = sz.sizesid",
-				"","","obj");
+				"1=1","","obj");
     	
     	if(count($transacciones)>0){
     		foreach ($transacciones as $t){
@@ -381,22 +381,28 @@ if($_POST)
     					<td>".$t->model."</td>
     					<td>".$t->color."</td>
     					<td>".$t->size."</td>
-    					<td>".utf8_encode($t->branch_origin)."</td>
     					<td>".$t->date_transition_down."</td>
-    					<td>".utf8_encode($e_sender)."</td>
-    					<td>".utf8_encode($e_transporter)."</td>";
+    					<td>".utf8_encode($t->branch_origin)."</td>
+    					<td>".utf8_encode($t->branch_destination)."</td>";
     			
     			if($t->branch_destination_id == $branchid && $t->employeeid_order == $employeeid){
+    				$res = $res."<td>".utf8_encode($t->employee_order)."</td>
+    					<td>".utf8_encode($e_sender)."</td>
+    					<td>".utf8_encode($e_transporter)."</td>";
     				
+    				if($t->employeeid_receiber != null){
+    					$res = $res."<td>".utf8_encode($e_receiver)."</td>";
+    				}else if($t->employeeid_sender == null || $t->employeeid_transporter == null){
+    					$res = $res."<td></td>";
+    				}else{
+    					$res = $res."<td><a href='#' class='receiveStock' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Recibir</a></td>";
+    				}
+    			}else if($t->branch_origin_id == $branchid){
+    				$res = $res."<td>".utf8_encode($t->employee_order)."</td>
+    					<td><a href='#' class='doTransition' idt='$t->transitionid' ide='$employeeid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
+    					<td></td>
+    					<td></td>";
     			}
-    				
-	    		if($t->employeeid_receiber != null){
-	    			$res = $res."<td>".utf8_encode($e_receiver)."</td>";
-	    		}else if($t->employeeid_sender == null || $t->employeeid_transporter == null){
-	    			$res = $res."<td></td>";
-	    		}else{
-	    			$res = $res."<td><a href='#' class='receiveStock' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Recibir</a></td>";
-	    		}
     			
 	    		$res = $res."</tr>";
     		}

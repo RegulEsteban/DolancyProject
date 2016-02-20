@@ -116,6 +116,7 @@ $(document).on('click', "#add-list-shoe-qr", addListShoeQr);
 $(document).on('click', ".orderImport", orderImport);
 $(document).on('click', "#transactionsButton", transactionsButton);
 $(document).on('click', ".receiveStock", receiveStock);
+$(document).on('click', ".doTransition", doTransition);
 
 function removeShoe(event){
 	var row = $(this).parents('tr')[0];
@@ -370,6 +371,10 @@ function transactionsButton(e){
 
 function receiveStock(e){
 	notificacionError(":D");
+}
+
+function doTransition(e){
+	notificacionError(".|.");
 }
 
 function notificacionError(texto){
