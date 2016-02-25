@@ -37,3 +37,9 @@ join color c on sh.colorid = c.colorid
 join sizes sz on sh.sizesid = sz.sizesid
 where t.branch_destination_id = 1 
 and t.employeeid_order = 1;
+
+select u.status, concat(e.firstname,' ',e.lastname) as name,e.email,e.phone,e.address, e.type_employee 
+from user_credentials u
+join employee e on u.employeeid = e.employeeid;
+
+select * from employee where employeeid not in (select employeeid from user_credentials);

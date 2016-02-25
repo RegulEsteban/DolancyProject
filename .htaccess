@@ -9,3 +9,4 @@ RewriteRule ^./$ ./index.php
 RewriteRule ^admin-(\w+)/?$ login.php?access=$1
 RewriteRule ^Bienvenido/?$ ./principal.php
 RewriteRule ^Empleados/?$ ./empleados.php
+RewriteRule ^Usuarios/?$ ./usuarios.php

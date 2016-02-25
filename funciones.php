@@ -162,6 +162,21 @@ function getBranchs(){
 	}
 }
 
+function getEmployeesList(){
+	$query=new Query();
+	$values = $query->select("employeeid, firstname, lastname","employee","employeeid not in (select employeeid from user_credentials)","","obj");
+	if(count($values)>0){
+		echo "<select id='employee_select' name='employee_select' class='form-control'>";
+		echo "<option value='' selected>Seleccione un Empleado</option>";
+		foreach ($values as $b){
+			echo "<option value='".$b->employeeid."'>".utf8_encode($b->firstname)." ".utf8_encode($b->lastename)."</option>";
+		}
+		echo "</select>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>No hay empleados disponibles.</div>";
+	}
+}
+
 function getDiscounts($type){
 	$query=new Query();
 	$values = $query->select("discountid, monto, description","cash_discount","type = $type","","obj");
@@ -292,7 +307,8 @@ function getShoes($branchid){
 function getAllEmployees(){
 	$query=new Query();
 	$values = $query->select("e.employeeid, e.firstname, e.lastname, e.matname, e.email, e.phone, e.address, e.type_employee, b.name branch_name, b.address as address_branch","employee e join branch b on b.branchid = e.branchid","e.status = 1","","obj");
-	echo "<table id='exampleEmployee' class='display' cellspacing='0' width='100%'>
+	if(count($values)>0){
+		echo "<table id='exampleEmployee' class='display' cellspacing='0' width='100%'>
     			<thead>
 					<tr>
                         <th>Nombre</th>
@@ -303,9 +319,7 @@ function getAllEmployees(){
 						<th>Sucursal - Dirección</th>
 						<th>Acción</th>
                 	</tr>
-                </thead>";
-	if(count($values)>0){
-		echo "<tbody>";
+                </thead><tbody>";
 		foreach ($values as $em){
 			$tipo = "";
 			if($em->type_employee == 0) $tipo="Vendedor";
@@ -324,6 +338,46 @@ function getAllEmployees(){
 		echo "</tbody></table>";
 	}else{
 		echo "<div class='alert alizarin' role='alert'>Sin Empleados</div>";
+	}
+}
+
+function getAllUsers(){
+	$query=new Query();
+	$values = $query->select("u.status, concat(e.firstname,' ',e.lastname) as name, e.email, e.phone, e.address, e.type_employee","user_credentials u join employee e on u.employeeid = e.employeeid","1=1","","obj");
+	if(count($values)>0){
+		echo "<table id='exampleUser' class='display' cellspacing='0' width='100%'>
+    			<thead>
+					<tr>
+                        <th>Nombre</th>
+						<th>Dirección</th>
+						<th>Teléfono</th>
+                        <th>Email</th>
+						<th>Tipo</th>
+                        <th>Activo</th>
+						<th>Acción</th>
+                	</tr>
+                </thead><tbody>";
+		foreach ($values as $em){
+			$tipo = "";
+			if($em->type_employee == 0) $tipo="Vendedor";
+			else if($em->type_employee == 1) $tipo = "Gerente";
+			else if($em->type_employee == 2) $tipo = "Director";
+			$activo = "";
+			if($em->status == 0) $activo = "<span class='glyphicon glyphicon-ok-circle'></span> Activo";
+			else if($em->status == 1) $activo = "<span class='glyphicon glyphicon-remove-circle'></span> Inactivo";
+				
+			echo "<tr><td>".utf8_encode($em->name)."</td>
+				<td>".utf8_encode($em->address)."</td>
+				<td>".$em->phone."</td>
+				<td>".$em->email."</td>
+				<td>".$tipo."</td>
+				<td>".$activo."</td>
+				<td><a href='#' class='editUsu' ide = '".$em->employeeid."'><span class='glyphicon glyphicon-pencil'></span> Editar</a> |
+				    <a href='#' class='removeUsu' ide = '".$em->employeeid."'><span class='glyphicon glyphicon-trash'></span> Eliminar</a></td></tr>";
+		}
+		echo "</tbody></table>";
+	}else{
+		echo "<div class='alert alizarin' role='alert'>Sin Usuarios</div>";
 	}
 }
 

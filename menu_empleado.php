@@ -14,6 +14,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="Bienvenido"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Inicio</a></li>
                 <li><a href="Empleados"><i class='icon-group icon-small'></i> Empleados</a></li>
+                <li><a href="Usuarios"><i class='icon-coffee icon-small'></i> Usuarios</a></li>
                 <?php toggleLogin() ?>
             </ul>
         </div>
