@@ -25,7 +25,7 @@ select * from detail_sale;
 
 select t.date_transition_down, t.date_transition_up, concat(eo.firstname,' ',eo.lastname,' ',eo.matname) as employee_order,
 concat(bo.name,' ',bo.address) as branch_origin, concat(bd.name,' ',bd.address) as branch_destination, m.title as model,
-c.title as color, sz.size, s.stockid
+c.title as color, sz.size, s.stockid, branch_destination_id, branch_origin_id
 from transition_shoe_log t
 join employee eo on t.employeeid_order = eo.employeeid
 join branch bo on t.branch_origin_id = bo.branchid 
@@ -34,9 +34,7 @@ join detail_stock s on t.stockid = s.stockid
 join shoe sh on s.shoeid = sh.shoeid
 join model m on sh.modelid = m.modelid
 join color c on sh.colorid = c.colorid
-join sizes sz on sh.sizesid = sz.sizesid
-where t.branch_destination_id = 1 
-and t.employeeid_order = 1;
+join sizes sz on sh.sizesid = sz.sizesid ;
 
 select u.status, concat(e.firstname,' ',e.lastname) as name,e.email,e.phone,e.address, e.type_employee 
 from user_credentials u

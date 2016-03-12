@@ -244,6 +244,18 @@ function getSaleList($employeeid){
 									join color c on c.colorid = shoe.colorid",
 									"ds.saleid = $venta->saleid ", "", "obj");
 			if(count($stocks)>0){
+				echo '<table id="idTableSaleList" saleid="'.$venta->saleid.'" class="table table-striped">
+		                    	<thead>
+		                        	<tr>
+		                            	<th>Modelo</th>
+		                            	<th>Talla</th>
+		                            	<th>Color</th>
+		                            	<th>Precio</th>
+		                            	<th>Acción</th>
+		                            	<th>Adicional</th>
+		                        	</tr>
+		                    	</thead>
+		        				<tbody>';
 				foreach ($stocks as $stock){
 					echo '<tr>
                   			<td>'.$stock->model.'</td>
@@ -251,19 +263,23 @@ function getSaleList($employeeid){
                   			<td>'.$stock->color.'</td>
                   			<td>'.$stock->price.'</td>
                   			<td><a href="#" class="removeShoeSaleList" stockid='.$stock->id.'><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td>
-                  			<td><a href="#" class="applyDiscount" stockidApply='.$stock->detail_sale_id.'><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>
+                  			<td><a href="#" class="applyDiscount" stockidApply='.$stock->detail_sale_id.' monto='.$stock->price.'><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>
 						</tr>';
 				}
+				echo '</tbody>
+	        				</table>';
+			}else{
+				echo "<div id='noResultSaleList' class='alert alizarin' role='alert'>Aún no hay listas de venta por mostrar.</div>";
 			}
 		}
 	}else{
-		echo "<div id='noResultSaleList' class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>";
+		echo "<div id='noResultSaleList' class='alert alizarin' role='alert'>Aún no hay listas de venta por mostrar.</div>";
 	}
 }
 
 function getShoes($branchid){
 	$query = new Query();
-	$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address, s.status",
+	$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, b.name as branch_name, b.address as branch_address, s.status, b.branchid",
 			"detail_stock s
 			join shoe on s.shoeid = shoe.shoeid
 			join model m on m.modelid = shoe.modelid
@@ -283,6 +299,7 @@ function getShoes($branchid){
 				<th>Acción</th>
 				</tr></thead><tbody>";
 		foreach ($stocks as $stock){
+			$transacciones = $query->select("stockid","transition_shoe_log","stockid = $stock->id","","obj");
 			echo '<tr>
                   	<td>'.$stock->model.'</td>
                   	<td>'.$stock->size.'</td>
@@ -292,10 +309,18 @@ function getShoes($branchid){
 			if($stock->status==1){
 				echo '<td><i class="icon-frown icon-small"></i> No disponible</td>
 					  <td><i class="icon-frown icon-small"></i> No disponible</td>';
+			}else if(count($transacciones)>0){
+				echo '<td><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Importando...</td>
+					  <td><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Importando...</td>';
 			}else{
-				echo '<td><a href="#" class="addShoeList" stockid='.$stock->id.'><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>
-					  <td><a role="button" stockid='.$stock->id.' data-loading-text="Importando..." class="btn btn-primary btn-sm orderImport" disabled="disabled"><span class="glyphicon glyphicon-import"></span> Importar</a></td>';
+				echo '<td><a href="#" class="addShoeList" stockid='.$stock->id.'><span class="glyphicon glyphicon-plus"></span> Lista de Venta</a></td>';
+				if(getBranchId()==$stock->branchid){
+					echo '<td><a role="button" stockid='.$stock->id.' data-loading-text="Importando..." class="btn btn-primary btn-sm orderImport" disabled="disabled"><span class="glyphicon glyphicon-import"></span> Importar</a></td>';
+				}else{
+					echo '<td><a role="button" stockid='.$stock->id.' branchid='.$stock->branchid.' data-loading-text="Importando..." class="btn btn-primary btn-sm orderImport" autocomplete="off"><span class="glyphicon glyphicon-import"></span> Importar</a></td>';
+				}
 			}
+			
 			echo '</tr>';
 		}
 		echo "</tbody></table>";

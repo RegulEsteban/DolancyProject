@@ -102,15 +102,19 @@ $(function()
         }
     });
     
+    $(".close-modal").click(function(event){
+    	Custombox.close();
+    });
 });
 
 $(document).on('click', ".removeShoeSaleList", removeShoe);
 $(document).on('click', ".addShoeList", addShoe);
 $(document).on('click', "#realizaVenta", realizaVenta);
 $(document).on('click', ".applyDiscount", applyDiscount);
-$(document).on('mousedown', ".viewDiscount", viewDiscount);
+$(document).on('click', ".viewDiscount", viewDiscount);
 $(document).on('click', "#applicateDiscount", applicateDiscount);
 $(document).on('click', "#saveClient", saveClient);
+$(document).on('click', "#omiteClient", omiteClient);
 $(document).on('click', "#search-shoe-qr", searchShoeQr);
 $(document).on('click', "#add-list-shoe-qr", addListShoeQr);
 $(document).on('click', ".orderImport", orderImport);
@@ -210,12 +214,29 @@ function saveClient(e){
 	}
 }
 
+function omiteClient(e){
+	var saleid = $("#idTableSaleList").attr("saleid");
+	var clientid=0;
+	$.post("funcionesJSON.php", { clientid: clientid, saleid: saleid, saveClient: true}, function(respuesta){
+		if(respuesta.error != null){
+			notificacionError(respuesta.error);
+		}else{
+			$('#clientModal').modal('hide');
+			$('#datosCliente').html("<i class='icon-user icon-small'></i> Nombre: Desconocido <br/>" +
+									"<i class='icon-envelope icon-small'></i> Email: Desconocido <br/>" +
+									"<i class='icon-phone icon-small'></i> Teléfono: Desconocido <br/>")
+			showSaleList(e);
+			$('#newClientForm')[0].reset();
+		}
+	}, 'json');
+	
+}
+
 function showSaleList(e){
 	var saleid = $("#idTableSaleList").attr("saleid");
 	
 	if(saleid===null || saleid===undefined || saleid==='0'){
-		$("#modalTitle").html("<span class='glyphicon glyphicon-thumbs-down'></span> Error!!! No existe venta. Favor de llamar a su administrador.");
-		$('#myModal').modal('show');
+		notificacionError("Error!!! No existe venta. Favor de llamar a su administrador.");
 	}else{
 		$.post("funcionesJSON.php", { saleid: saleid, getSale: true}, function(respuesta){
 			if(respuesta.error != null){
@@ -223,7 +244,9 @@ function showSaleList(e){
 			}else{
 				$('#getSaleTable tbody').html(respuesta.resultado);
 				$("#totalComponent").html(respuesta.total);
-				$('#modalSale').modal('show');
+				
+				openModal("#modalSale");
+				e.preventDefault();
 			}
 		}, 'json');
 	}
@@ -232,71 +255,104 @@ function showSaleList(e){
 function realizaVenta(e){
 	var tabla = $("#example").DataTable();
 	tabla.clear().draw();
-	
-	$.post("funcionesJSON.php", { getClients: true }, function(respuesta){
-		if(respuesta.error != null){
-			notificacionError(respuesta.error);
-		}else{
-			var res = respuesta.resultado;
-			for( var index in res){
-				if(index != 'remove')
-				tabla.row.add([res[index].clientid, 
-				               res[index].firstname+' '+res[index].lastname+' '+res[index].matname, 
-				               res[index].email, 
-				               res[index].phone])
-				               .draw();
+	var saleid = $("#idTableSaleList").attr("saleid");
+	if(saleid===null || saleid===undefined || saleid==='0'){
+		notificacionError("Aún no hay productos en la lista de venta.");
+	}else{
+		$.post("funcionesJSON.php", { getClients: true }, function(respuesta){
+			if(respuesta.error != null){
+				notificacionError(respuesta.error);
+			}else{
+				var res = respuesta.resultado;
+				for( var index in res){
+					if(index != 'remove')
+					tabla.row.add([res[index].clientid, 
+					               res[index].firstname+' '+res[index].lastname+' '+res[index].matname, 
+					               res[index].email, 
+					               res[index].phone])
+					               .draw();
+				}
+				
+				$('#clientModal').modal('show');
 			}
-			
-			$('#clientModal').modal('show');
-		}
-	}, 'json');
+		}, 'json');
+	}
 	
 }
 
 function viewDiscount(e){
-	if(e.button == 2){
-		var precio = $(this).html();
-		var discount = $("#discount_select").val();
-		$("#applicateDiscount").hide();
-		
-		if(discount === undefined){
-			$("#testDiscount").html("No se puede aplicar.");
-		}else{
-			$("#testDiscount").html("<h2>$"+(precio-discount)+"</h2>");
-			
-			$("#discount_select").val('0');
-			$('#discount_select').on('change', function() {
-				  discount = $('#discount_select option:selected').attr('monto');
-				  $("#testDiscount").html("<h2>$"+(precio-discount)+"</h2>");
-			});
-		}
-		
-		$("#modalDiscount").modal('show');
-	}
-}
-
-function applyDiscount(event){
-	var detail_sale_id = $(event.target).attr("stockidApply");
-	var discount = $("#discount_select").val();
+	$("#discount_select").val('0');
 	
-	$("#applicateDiscount").show();
+	var precioTxt = $(this).html();
+	var precio = precioTxt * 1.0;
+	var discount = precio - ($('#discount_select option:selected').attr('monto') * 1.0);
 	
-	$("#testDiscount").html("...");
-	$("#applicateDiscount").html("Aplicar Descuento");
+	$("#applicateDiscount").hide();
 	
 	if(discount === undefined){
 		$("#testDiscount").html("No se puede aplicar.");
-		$("#applicateDiscount").hide();
 	}else{
-		$("#discount_select").attr("stockToDiscount", detail_sale_id);
+		$("#testDiscount").html("<h2><span class='glyphicon glyphicon-thumbs-down'></span> $"+(precio.toFixed(2))+
+				" &nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-resize-horizontal'></span>&nbsp;&nbsp;&nbsp;&nbsp;"+
+				"<span class='glyphicon glyphicon-thumbs-up'></span> $"+(discount.toFixed(2))+"</h2>");
+		
 		$("#discount_select").val('0');
 		$('#discount_select').on('change', function() {
-			  discount = $('#discount_select option:selected').attr('monto');
-			  $("#testDiscount").html("<h2>$"+discount+"</h2>");
+			  discount = precio - ($('#discount_select option:selected').attr('monto') * 1.0);
+			  $("#testDiscount").html("<h2><span class='glyphicon glyphicon-thumbs-down'></span> $"+(precio.toFixed(2))+
+						"&nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-resize-horizontal'></span>&nbsp;&nbsp;&nbsp;&nbsp;"+
+						"<span class='glyphicon glyphicon-thumbs-up'></span> $"+(discount.toFixed(2))+"</h2>");
 		});
 	}
 	
-	$("#modalDiscount").modal('show');
+	openModal("#modalDiscount");
+}
+
+function applyDiscount(event){
+	$("#discount_select").val('0');
+	var detail_sale_id = $(event.target).attr("stockidApply");
+	var precioTxt = $(this).attr('monto');
+	
+	$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, getDiscount: true }, function(respuesta){
+		if(respuesta.error != null){
+			notificacionError(respuesta.error);
+		}else{
+			if(respuesta.discountid==null || respuesta.discountid=='0'){
+				var precio = precioTxt * 1.0;
+				var discount = precio - ($('#discount_select option:selected').attr('monto') * 1.0);
+				
+				$("#applicateDiscount").show();
+				$("#applicateDiscount").html("Aplicar Descuento");
+				
+				if(discount === undefined){
+					$("#testDiscount").html("No se puede aplicar.");
+				}else{
+					$("#testDiscount").html("<h2><span class='glyphicon glyphicon-thumbs-down'></span> $"+(precio.toFixed(2))+
+							" &nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-resize-horizontal'></span>&nbsp;&nbsp;&nbsp;&nbsp;"+
+							"<span class='glyphicon glyphicon-thumbs-up'></span> $"+(discount.toFixed(2))+"</h2>");
+					
+					$("#discount_select").val('0');
+					$('#discount_select').on('change', function() {
+						  discount = precio - ($('#discount_select option:selected').attr('monto') * 1.0);
+						  $("#testDiscount").html("<h2><span class='glyphicon glyphicon-thumbs-down'></span> $"+(precio.toFixed(2))+
+									"&nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-resize-horizontal'></span>&nbsp;&nbsp;&nbsp;&nbsp;"+
+									"<span class='glyphicon glyphicon-thumbs-up'></span> $"+(discount.toFixed(2))+"</h2>");
+					});
+				}
+				$("#discount_select").attr("stockToDiscount",detail_sale_id);
+				openModal("#modalDiscount");
+			}else{
+				$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, discountid: 0, appDiscount: true}, function(respuesta){
+					if(respuesta.error != null){
+						notificacionError(respuesta.error);
+					}else{
+						notificacionSuccess("Descuento eliminado.");
+					}
+				}, 'json');
+			}
+		}
+	}, 'json');
+	
 }
 
 function applicateDiscount(e){
@@ -315,13 +371,15 @@ function applicateDiscount(e){
 }
 
 function searchShoeQr(e){
-	$('#qr').modal('show');
 	$('input#typeModalQR').val("S-QR");
+	openModal("#qr");
+	e.preventDefault();
 }
 
 function addListShoeQr(e){
-	$('#qr').modal('show');
 	$('input#typeModalQR').val("AL-QR");
+	openModal("#qr");
+	e.preventDefault();
 }
 
 function orderImport(e){
@@ -374,7 +432,10 @@ function receiveStock(e){
 }
 
 function doTransition(e){
-	notificacionError(".|.");
+	$('input#typeModalQR').val("TS-QR");
+	openModal("#qr");
+	e.preventDefault();
+	 $("button#play").trigger("click");
 }
 
 function notificacionError(texto){
@@ -386,5 +447,25 @@ function notificacionError(texto){
         theme       : 'defaultTheme',
         type		: 'error',
         timeout     : 8000
+    });
+}
+
+function notificacionSuccess(texto){
+	var n = noty({
+        text        : "<span class='glyphicon glyphicon-thumbs-down'></span> "+texto,
+        type        : 'alert',
+        dismissQueue: true,
+        layout      : 'topRight',
+        theme       : 'defaultTheme',
+        type		: 'success',
+        timeout     : 8000
+    });
+}
+
+function openModal(modal){
+	Custombox.open({
+        target: modal,
+        effect: 'fadein',
+        zIndex: 1
     });
 }

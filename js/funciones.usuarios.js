@@ -39,8 +39,8 @@ $(function()
                 minlength: 5,
                 required: true
             },
-            usu_check: {
-            	required: true
+            usu_pass_rep: {
+            	equalTo: "#usu_pass"
             }
         },
         highlight: function(element) {
@@ -61,3 +61,48 @@ $(function()
     });
     
 });
+
+$(document).on('click', "#saveUsu", saveUsu);
+
+function saveUsu(e){
+	var tabla = $("#exampleUser").DataTable();
+	var isValid = $('#newUserForm').valid();
+	var validator = $("#newUserForm").validate();
+	
+	if(isValid){
+		$.post("funcionesJSON.php", { usu_pass: $('#usu_pass').val(), 
+										employee_select: $('#employee_select').val(),
+										usu_email: $('#usu_email').val(),
+										saveNewUser: true}, function(respuesta){
+											
+			if(respuesta.error != null){
+				notificacionError(respuesta.error);
+			}else{
+				tabla.row.add([respuesta.name, 
+								respuesta.address,
+								respuesta.phone,
+								respuesta.email,
+								respuesta.tipo,
+								respuesta.activo,
+								respuesta.accion])
+				               .draw();
+				validator.resetForm();
+				notificacionSuccess("Usuario guardado.");
+			}
+		}, 'json');
+	}else{
+		return false;
+	}
+}
+
+function notificacionSuccess(texto){
+	var n = noty({
+        text        : "<br><span class='glyphicon glyphicon-ok'></span> "+texto,
+        type        : 'alert',
+        dismissQueue: true,
+        layout      : 'top',
+        theme       : 'defaultTheme',
+        type		: 'success',
+        timeout     : 8000
+    });
+}

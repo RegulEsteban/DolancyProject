@@ -38,19 +38,20 @@ if(!isLogin()){
 		    								<label for="Usu_email_label">Email:</label>
 		    								<input type="email" class="form-control" id="usu_email" name="usu_email" placeholder="Correo Electrónico">
 		  								</div>
-	    								<div class="form-group">
-		    								<label for="Usu_password_label">Password:</label>
-		    								<input type="password" class="form-control" id="usu_pass" name="usu_pass" placeholder="Password">
-		  								</div>
-	    							</div>
-	    							<div class="col-md-6">
-		  								<div class="checkbox">
-    										<label><input type="checkbox" checked="checked" id="usu_check" name="usu_check"> ¿Activo?</label>
-  										</div>
 		  								<div class="form-group">
 	    									<label for="color_label">Empleado: </label>
 	    									<?php getEmployeesList(); ?>
 	  									</div>
+	    							</div>
+	    							<div class="col-md-6">
+		  								<div class="form-group">
+		    								<label for="Usu_password_label">Password:</label>
+		    								<input type="password" class="form-control" id="usu_pass" name="usu_pass" placeholder="Password">
+		  								</div>
+		  								<div class="form-group">
+		    								<label for="Usu_passwordr_label">Repeat Password:</label>
+		    								<input type="password" class="form-control" id="usu_pass_rep" name="usu_pass_rep" placeholder="Vuelva a escribir el password">
+		  								</div>
 	    							</div>
 	  								
 	  								<button type="button" id="saveUsu" class="btn btn-primary">Guardar</button>

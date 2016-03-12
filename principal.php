@@ -35,7 +35,7 @@ if(!isLogin()){
     							<?php getModels(); ?>
   							</div>
   							<button type="button" class="btn btn-primary" id="search_shoe"><i class="icon-search icon-small"></i> Buscar</button>
-  							<a target="_self" href="#" class="btn btn-success pull-right" id="search-shoe-qr"><i class="icon-qrcode icon-small"></i> Escanear QR</a>
+  							<a target="_self" href="#" class="btn btn-success pull-right play-qr" id="search-shoe-qr"><i class="icon-qrcode icon-small"></i> Buscar con QR</a>
 						</form>
 	  				</div>
 				</div>
@@ -87,35 +87,17 @@ if(!isLogin()){
 	    				<div class='panel-heading'>
 							<p>
 								Lista de Venta
-								<button type="button" id="add-list-shoe-qr" class="btn btn-success pull-right"><i class='icon-qrcode icon-small'></i> Escanear QR</button>
+								<button type="button" id="add-list-shoe-qr" class="btn btn-success pull-right play-qr"><i class='icon-qrcode icon-small'></i> Agregar con QR</button>
 								<button type="button" id="realizaVenta" class="btn btn-primary pull-right" ><span class='glyphicon glyphicon-new-window'></span> Realizar</button>						
 							</p>
 	    				</div>
 	    				<div class='panel-body'>
 	    					<?php 
 	    					if(existSaleList(getUsuId())==0){
+	    						echo "<div id='noResultSaleList' class='alert alizarin' role='alert'>Aún no hay listas de venta por mostrar.</div>"; 
+	    					}else{
 	    						getSaleList(getUsuId());
-	    					}
-							?>
-	    					<table id="idTableSaleList" saleid="<?php echo existSaleList(getUsuId()) ?>" class="table table-striped">
-		                    	<thead>
-		                        	<tr>
-		                            	<th>Modelo</th>
-		                            	<th>Talla</th>
-		                            	<th>Color</th>
-		                            	<th>Precio</th>
-		                            	<th>Acción</th>
-		                            	<th>Adicional</th>
-		                        	</tr>
-		                    	</thead>
-		        				<tbody>
-		        					<?php 
-			    					if(existSaleList(getUsuId())>0){
-			    						getSaleList(getUsuId());
-			    					}
-									?>
-		        				</tbody>
-	        				</table>
+							}?>
 	    				</div>
 	  				</div>
 	  			</div>
@@ -125,11 +107,11 @@ if(!isLogin()){
 
     <?php include("footer.php"); ?>
 	
-	<div class="modal fade" id="modalSale" tabindex="-1" role="dialog" aria-labelledby="ModalSale">
+	<div id="modalSale" tabindex="-1" role="dialog" aria-labelledby="ModalSale" hidden="hidden">
   		<div class="modal-dialog modal-lg" role="document">
     		<div class="modal-content">
       			<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        			<button type="button" class="close close-modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         			<h4 class="modal-title">Detalle de Venta</h4>
       			</div>
       			<div id="services" class="modal-body">
@@ -171,19 +153,19 @@ if(!isLogin()){
     				
       			</div>
       			<div class="modal-footer">
-      				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-        			<button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+      				<button type="button" class="btn btn-danger close-modal">Cancelar</button>
+        			<button type="button" class="btn btn-primary btn-lg">Aceptar</button>
       			</div>
     		</div>
   		</div>
 	</div>
 	
 	
-	<div class="modal fade" id="modalDiscount" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div id="modalDiscount" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" hidden="hidden">
   		<div class="modal-dialog" role="document">
     		<div class="modal-content">
       			<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        			<button type="button" class="close close-modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         			<h4 class="modal-title">Descuentos</h4>
       			</div>
       			<div class="modal-body">
@@ -196,8 +178,8 @@ if(!isLogin()){
 					<div id="testDiscount" class="alert alert-success" role="alert">...</div>
       			</div>
       			<div class="modal-footer">
-      				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-        			<button type="button" id="applicateDiscount" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+      				<button type="button" class="btn btn-danger close-modal">Cancelar</button>
+        			<button type="button" id="applicateDiscount" class="btn btn-primary close-modal">Aceptar</button>
       			</div>
     		</div>
   		</div>
@@ -207,7 +189,7 @@ if(!isLogin()){
   		<div class="modal-dialog modal-lg" role="document">
     		<div class="modal-content">
       			<div class="modal-header">
-        			<button type="button" id="omiteClient" class="btn btn-default btn-small pull-right" data-dismiss="modal" aria-label="Omitir Cliente">Omitir Cliente <span class='glyphicon glyphicon-chevron-right'></span></button>
+        			<button type="button" id="omiteClient" class="btn btn-default btn-small pull-right" aria-label="Omitir Cliente">Omitir Cliente <span class='glyphicon glyphicon-chevron-right'></span></button>
         			<h4 class="modal-title">Seleccionar Cliente</h4>
       			</div>
       			<div class="modal-body">
@@ -266,7 +248,7 @@ if(!isLogin()){
   		</div>
 	</div>
 	
-	<div class="modal fade" id="qr" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div id="qr" tabindex="-1" aria-labelledby="myModalLabel" hidden="hidden">
   		<div class="modal-dialog modal-lg" role="document">
     		<div class="modal-content">
       			<div class="modal-header">
@@ -281,6 +263,7 @@ if(!isLogin()){
 		                <div class="panel-body text-center">
 		                    <div class="col-md-6">
 		                    	<input type="hidden" id="typeModalQR" value="">
+		                    	<button type="button" id="play" hidden="hidden"></button>
 		                        <div class="well" style="position: relative;display: inline-block;">
 		                            <canvas width="320" height="240" id="webcodecam-canvas"></canvas>
 		                            <div class="scanner-laser laser-rightBottom" style="opacity: 0.5;"></div>
@@ -295,7 +278,7 @@ if(!isLogin()){
 		                                <img width="320" height="240" id="scanned-img" src="">
 		                            </div>
 		                            <div class="caption">
-		                                <h3>Scanned result</h3>
+		                                <h3>Resultado</h3>
 		                                <p id="scanned-QR"></p>
 		                            </div>
 		                        </div>
@@ -305,7 +288,6 @@ if(!isLogin()){
       			</div>
       			<div class="modal-footer">
       				<button type="button" class="btn btn-danger stop-qr" data-dismiss="modal">Cancelar</button>
-        			<button type="button" class="btn btn-primary stop-qr" data-dismiss="modal">Aceptar</button>
       			</div>
     		</div>
   		</div>
@@ -339,7 +321,6 @@ if(!isLogin()){
 	            	</table>			            	
       			</div>
       			<div class="modal-footer">
-      				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
         			<button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
       			</div>
     		</div>

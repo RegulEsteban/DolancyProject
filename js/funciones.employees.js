@@ -87,6 +87,8 @@ $(document).on('click', ".removeEmployee", removeEmployee);
 function saveEmployee(e){
 	var tabla = $("#exampleEmployee").DataTable();
 	var isValid = $('#newEmployeeForm').valid();
+	var validator = $("#newEmployeeForm").validate();
+	
 	if(isValid){
 		$.post("funcionesJSON.php", { employee_name: $('#employee_name').val(), 
 										employee_lastname: $('#employee_lastname').val(),

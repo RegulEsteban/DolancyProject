@@ -216,7 +216,7 @@ if($_POST)
     	$discountid = $_POST["discountid"];
     	
     	$query = new Query();
-    	if($detailSaleId!=0 && $discountid!=0){
+    	if($detailSaleId!=0){
     		if($query->update("detail_sale","discountid = $discountid", "detail_sale_id = $detailSaleId","")){
     			$miArray = array("error"=>null);
     			echo json_encode($miArray);
@@ -226,6 +226,21 @@ if($_POST)
     		}
     	}else{
     		$miArray = array("error"=>"Los valores para el descuento son incorrectos. Favor de solicitar al administrador.");
+    		echo json_encode($miArray);
+    	}
+    }else if($_POST["getDiscount"]){
+    	$detailSaleId = $_POST["detailSaleId"];
+    	
+    	$query = new Query();
+    	$values = $query->select("ds.detail_sale_id, ds.saleid, ds.stockid, d.discountid, d.monto, d.description, d.date_expiration, d.type, d.acumulated",
+    							"detail_sale ds left join cash_discount d on ds.discountid = d.discountid","ds.detail_sale_id = $detailSaleId","","obj");
+    	if(count($values)==1){
+    		foreach ($values as $v){
+    			$miArray = array("error"=>null,"detail_sale_id"=>$v->detail_sale_id,"discountid"=>$v->discountid,"monto"=>$v->monto); 	
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"Los valores para el descuento son incorrectos. Favor de llamar a su administrador.");
     		echo json_encode($miArray);
     	}
     }else if($_POST["getClients"]){
@@ -347,7 +362,7 @@ if($_POST)
     	$transacciones = $query->select("transitionid, t.date_transition_down, employeeid_sender, 
     									t.date_transition_up, employeeid_transporter, employeeid_receiber,
     									concat(eo.firstname,' ',eo.lastname,' ',eo.matname) as employee_order, employeeid_order, 
-    									concat(bo.name,' ',bo.address) as branch_origin, 
+    									concat(bo.name,' ',bo.address) as branch_origin, branch_origin_id,
     									concat(bd.name,' ',bd.address) as branch_destination, branch_destination_id,
     									m.title as model, c.title as color, sz.size, s.stockid",
     			"transition_shoe_log t
@@ -383,11 +398,11 @@ if($_POST)
     					<td>".$t->size."</td>
     					<td>".$t->date_transition_down."</td>
     					<td>".utf8_encode($t->branch_origin)."</td>
-    					<td>".utf8_encode($t->branch_destination)."</td>";
+    					<td>".utf8_encode($t->branch_destination)."</td>
+    					<td>".utf8_encode($t->employee_order)."</td>";
     			
-    			if($t->branch_destination_id == $branchid && $t->employeeid_order == $employeeid){
-    				$res = $res."<td>".utf8_encode($t->employee_order)."</td>
-    					<td>".utf8_encode($e_sender)."</td>
+    			if($t->branch_destination_id == $branchid){
+    				$res = $res."<td>".utf8_encode($e_sender)."</td>
     					<td>".utf8_encode($e_transporter)."</td>";
     				
     				if($t->employeeid_receiber != null){
@@ -398,8 +413,7 @@ if($_POST)
     					$res = $res."<td><a href='#' class='receiveStock' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Recibir</a></td>";
     				}
     			}else if($t->branch_origin_id == $branchid){
-    				$res = $res."<td>".utf8_encode($t->employee_order)."</td>
-    					<td><a href='#' class='doTransition' idt='$t->transitionid' ide='$employeeid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
+    				$res = $res."<td><a href='#' class='doTransition play-qr' idt='$t->transitionid' ide='$employeeid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
     					<td></td>
     					<td></td>";
     			}
@@ -413,6 +427,37 @@ if($_POST)
     		echo json_encode($miArray);
     	}
     	
+    }else if($_POST["saveNewUser"]){
+    	$usu_pass = $_POST["usu_pass"];
+    	$employee_select = $_POST["employee_select"];
+    	$usu_email = $_POST["usu_email"];
+    	$usu_pass=$usu_pass."#dolancy100291#";
+    	$query = new Query();
+    	
+    	if($query->insert("user_credentials", "email, password, employeeid, status","'".sha1(limpiaEmail($usu_email))."', '".sha1(__($usu_pass))."', $employee_select, 0","")){
+    		$employee = $query->select("concat(firstname,' ',lastname) as name, email, phone, address, type_employee","employee","employeeid = $employee_select", "", "obj");
+    		if(count($employee)==1){
+    			foreach ($employee as $e){
+    				$tipo = "";
+    				if($em->type_employee == 0) $tipo="Vendedor";
+    				else if($em->type_employee == 1) $tipo = "Gerente";
+    				else if($em->type_employee == 2) $tipo = "Director";
+    				
+    				$activo = "<span class='glyphicon glyphicon-ok-circle'></span> Activo";
+    				$action = "<a href='#'><span class='glyphicon glyphicon-pencil'></span> Editar</a> | <a href='#'><span class='glyphicon glyphicon-trash'></span> Desactivar</a>";
+    				
+    				$miArray = array("error"=>null, "tipo"=>$tipo, "activo"=>$activo, "name"=>utf8_encode($em->name), "address"=>utf8_encode($em->address), "email"=>$em->email, "phone"=>$em->phone, "accion"=>$action);
+    				echo json_encode($miArray);
+    			}
+    		}else{
+    			$miArray = array("error"=>"Error al insertar usuario.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"Error al insertar usuario.");
+    		echo json_encode($miArray);
+    	}
+    		
     }
     
 }else if($_GET){

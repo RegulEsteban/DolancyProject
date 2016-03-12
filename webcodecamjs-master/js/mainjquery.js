@@ -10,8 +10,7 @@
         imageUrl = $("#image-url"),
         decodeLocal = $("#decode-img"),
         play = $("#play"),
-        playSearch = $("#search-shoe-qr"),
-        playAddList = $("#add-list-shoe-qr"),
+        playS = $(".play-qr"),
         scannedImg = $("#scanned-img"),
         scannedQR = $("#scanned-QR"),
         grabImg = $("#grab-img"),
@@ -125,8 +124,8 @@
         }
     };
     var decoder = $("#webcodecam-canvas").WebCodeCamJQuery(args).data().plugin_WebCodeCamJQuery;
-    decoder.buildSelectMenu("#camera-select", "environment|back").init();
     decoder.options.flipHorizontal = true;
+    decoder.buildSelectMenu("#camera-select", "environment|back").init();
     decodeLocal.on("click", function() {
         Page.decodeLocalImage();
     });
@@ -135,12 +134,7 @@
         grabImg.removeClass("disabled");
         decoder.play();
     });
-    playSearch.on("click", function() {
-        scannedQR.text("Scanning ...");
-        grabImg.removeClass("disabled");
-        decoder.play();
-    });
-    playAddList.on("click", function() {
+    playS.on("click", function() {
         scannedQR.text("Scanning ...");
         grabImg.removeClass("disabled");
         decoder.play();
@@ -153,16 +147,13 @@
         decoder.pause();
     });
     stop.on("click", function(event) {
+    	Custombox.close("#qr");
         grabImg.addClass("disabled");
         scannedQR.text("Stopped");
         decoder.stop();
     });
-//    stopQR.on("click", function(event) {
-//        grabImg.addClass("disabled");
-//        scannedQR.text("Stopped");
-//        decoder.stop();
-//    });
     stopQR.click(function(event) {
+    	Custombox.close("#qr");
         grabImg.addClass("disabled");
         scannedQR.text("Stopped");
         decoder.stop();
