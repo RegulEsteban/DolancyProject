@@ -27,30 +27,6 @@ $(function()
         },
         bInfo: false, bLengthChange: false
     });
-	
-	var color_select = document.getElementById("color_select");
-	var size_select = document.getElementById("size_select");
-	var model_select = document.getElementById("model_select");
-	
-    $("#search_shoe").click(function(event){
-    	$('#tablasProductos a:first').tab('show');
-    	$.post("funcionesJSON.php", {model: model_select.value, color: color_select.value, size: size_select.value}, function(respuesta) {
-    		if (respuesta === "null")
-    		{
-    			$("#search_shoe_result").html("<div class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>");
-    		} else {
-    			$("#search_shoe_result").html("<table class='table table-striped'><thead><tr>"+
-                            	"<th>Modelo</th>"+
-                            	"<th>Talla</th>"+
-                            	"<th>Color</th>"+
-                            	"<th>Precio</th>"+
-                            	"<th>Sucursal</th>"+
-                            	"<th>Agregar</th>"+
-                            	"<th>Acción</th>"+
-                            	"</tr></thead><tbody>"+respuesta+"</tbody></table>");
-    		}
-      },'json');
-    });
     
     $('#newClientForm').validate({
     	lang: 'es',
@@ -105,8 +81,14 @@ $(function()
     $(".close-modal").click(function(event){
     	Custombox.close();
     });
+    
 });
 
+$(document).on('click', "#search_shoe", {
+	param_model: $("#model_select").val(), 
+	param_color: $("#color_select").val(),
+	param_size: $("#size_select").val()
+		}, search_shoe);
 $(document).on('click', ".removeShoeSaleList", removeShoe);
 $(document).on('click', ".addShoeList", addShoe);
 $(document).on('click', "#realizaVenta", realizaVenta);
@@ -121,6 +103,31 @@ $(document).on('click', ".orderImport", orderImport);
 $(document).on('click', "#transactionsButton", transactionsButton);
 $(document).on('click', ".receiveStock", receiveStock);
 $(document).on('click', ".doTransition", doTransition);
+$(document).on('click', ".doSendShoe", doSendShoe);
+
+function search_shoe(e){
+	var model_select = e.data.param_model;
+	var color_select = e.data.param_color;
+	var size_select = e.data.param_size;
+	
+	$('#tablasProductos a:first').tab('show');
+	$.post("funcionesJSON.php", {model: model_select, color: color_select, size: size_select}, function(respuesta) {
+		if (respuesta === "null")
+		{
+			$("#search_shoe_result").html("<div class='alert alizarin' role='alert'>No hay resultados para la búsqueda.</div>");
+		} else {
+			$("#search_shoe_result").html("<table class='table table-striped'><thead><tr>"+
+                        	"<th>Modelo</th>"+
+                        	"<th>Talla</th>"+
+                        	"<th>Color</th>"+
+                        	"<th>Precio</th>"+
+                        	"<th>Sucursal</th>"+
+                        	"<th>Agregar</th>"+
+                        	"<th>Acción</th>"+
+                        	"</tr></thead><tbody>"+respuesta+"</tbody></table>");
+		}
+  },'json');
+}
 
 function removeShoe(event){
 	var row = $(this).parents('tr')[0];
@@ -132,16 +139,21 @@ function removeShoe(event){
 		if(respuesta.error === null){
 			row.remove();
 		}else{
-			$("#modalTitle").html(respuesta.error);
-			$('#myModal').modal('show');
+			notificacionError(respuesta.error);
 		}
 	}, 'json');
 }
 
 function addShoe(event){
-	var stockid = $(event.target).attr("stockid");
-	var saleid = $("#idTableSaleList").attr("saleid");
 	var row = $(this).parents('tr')[0];
+	var saleid = $("#idTableSaleList").attr("saleid");
+	
+	if(event.target!=undefined){
+		var stockid = $(event.target).attr("stockid");
+	}else{
+		var stockid = event.data.stockid;
+	}
+	
 	$.post("funcionesJSON.php", {stockid: stockid, saleid: saleid, addShoe: true}, function(respuesta){
 		if(respuesta.error != null){
 			notificacionError(respuesta.error);
@@ -152,10 +164,11 @@ function addShoe(event){
 					'</td><td>'+respuesta.size+
 					'</td><td>'+respuesta.color+
 					'</td><td>'+respuesta.price+
+					'<td><a href="#" class="applyDiscount" stockidApply="'+respuesta.id_detail+'" monto="'+respuesta.price+'"><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>'+
 					'</td><td><a href="#" class="removeShoeSaleList" stockid="'+respuesta.stockid+'"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td>'+
-					'<td><a href="#" class="applyDiscount" stockidApply="'+respuesta.stockid+'"><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>'+
 					'</tr>');
 			row.remove();
+			notificacionSuccess("Producto Agregado.");
 		}
 	}, 'json');
 }
@@ -285,7 +298,7 @@ function viewDiscount(e){
 	
 	var precioTxt = $(this).html();
 	var precio = precioTxt * 1.0;
-	var discount = precio - ($('#discount_select option:selected').attr('monto') * 1.0);
+	var discount = precio - (($('#discount_select option:selected').attr('monto')==undefined ? 0.0 : $('#discount_select option:selected').attr('monto') ) * 1.0);
 	
 	$("#applicateDiscount").hide();
 	
@@ -312,14 +325,14 @@ function applyDiscount(event){
 	$("#discount_select").val('0');
 	var detail_sale_id = $(event.target).attr("stockidApply");
 	var precioTxt = $(this).attr('monto');
-	
+	var element = $(this);
 	$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, getDiscount: true }, function(respuesta){
 		if(respuesta.error != null){
 			notificacionError(respuesta.error);
 		}else{
 			if(respuesta.discountid==null || respuesta.discountid=='0'){
 				var precio = precioTxt * 1.0;
-				var discount = precio - ($('#discount_select option:selected').attr('monto') * 1.0);
+				var discount = precio - (($('#discount_select option:selected').attr('monto')==undefined ? 0.0 : $('#discount_select option:selected').attr('monto') ) * 1.0);
 				
 				$("#applicateDiscount").show();
 				$("#applicateDiscount").html("Aplicar Descuento");
@@ -333,22 +346,43 @@ function applyDiscount(event){
 					
 					$("#discount_select").val('0');
 					$('#discount_select').on('change', function() {
-						  discount = precio - ($('#discount_select option:selected').attr('monto') * 1.0);
+						  discount = precio - (($('#discount_select option:selected').attr('monto')==undefined ? 0.0 : $('#discount_select option:selected').attr('monto') ) * 1.0);
 						  $("#testDiscount").html("<h2><span class='glyphicon glyphicon-thumbs-down'></span> $"+(precio.toFixed(2))+
 									"&nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-resize-horizontal'></span>&nbsp;&nbsp;&nbsp;&nbsp;"+
 									"<span class='glyphicon glyphicon-thumbs-up'></span> $"+(discount.toFixed(2))+"</h2>");
 					});
 				}
 				$("#discount_select").attr("stockToDiscount",detail_sale_id);
+				$("#discount_select").attr("monto_discount",discount);
 				openModal("#modalDiscount");
 			}else{
-				$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, discountid: 0, appDiscount: true}, function(respuesta){
-					if(respuesta.error != null){
-						notificacionError(respuesta.error);
-					}else{
-						notificacionSuccess("Descuento eliminado.");
-					}
-				}, 'json');
+				var n = noty({
+			        text        : '¿Seguro(a) que desea eliminar el descuento?',
+			        type        : 'alert',
+			        dismissQueue: true,
+			        layout      : 'center',
+			        modal		: true,
+			        theme       : 'defaultTheme',
+			        buttons     : [
+			            {addClass: 'btn btn-primary', text: 'Aceptar', onClick: function ($noty) {
+				            	$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, discountid: 0, appDiscount: true}, function(respuesta){
+									if(respuesta.error != null){
+										notificacionError(respuesta.error);
+									}else{
+										element.html("<span class='glyphicon glyphicon-heart-empty'></span> Adicional");
+										notificacionSuccess("Descuento eliminado.");
+									}
+								}, 'json');
+			                	$noty.close();
+			            	}
+			            },
+			            {addClass: 'btn btn-danger', text: 'Cancelar', onClick: function ($noty) {
+			            		$noty.close();
+			            	}
+			            }
+			        ]
+			    });
+				
 			}
 		}
 	}, 'json');
@@ -358,6 +392,7 @@ function applyDiscount(event){
 function applicateDiscount(e){
 	var discountid = $("#discount_select").val();
 	var detail_sale_id = $("#discount_select").attr("stockToDiscount");
+	var monto = $("#idTableSaleList").find("[stockidApply='" + detail_sale_id + "']").attr("monto");
 	
 	if(discountid==='0'){
 		notificacionError("Debe de seleccionar al menos una opción de descuento.");
@@ -365,19 +400,22 @@ function applicateDiscount(e){
 		$.post("funcionesJSON.php", { detailSaleId: detail_sale_id, discountid: discountid, appDiscount: true}, function(respuesta){
 			if(respuesta.error != null){
 				notificacionError(respuesta.error);
+			}else{
+				$("#idTableSaleList").find("[stockidApply='" + detail_sale_id + "']").html("<span class='glyphicon glyphicon-heart'></span> "+(monto-respuesta.monto).toFixed(2));
+				notificacionSuccess("Descuento Aplicado.");
 			}
 		}, 'json');
 	}
 }
 
 function searchShoeQr(e){
-	$('input#typeModalQR').val("S-QR");
+	$('input#typeModalQR').val(codeSearchQR);
 	openModal("#qr");
 	e.preventDefault();
 }
 
 function addListShoeQr(e){
-	$('input#typeModalQR').val("AL-QR");
+	$('input#typeModalQR').val(codeAddToListQR);
 	openModal("#qr");
 	e.preventDefault();
 }
@@ -422,20 +460,49 @@ function transactionsButton(e){
 			notificacionError(respuesta.error);
 		}else{
 			$('#modalTransactions').modal('show');
-			$('#transactionsList tbody').append(respuesta.respuesta);
+//			$('#transactionsList tbody').append(respuesta.respuesta);
+			$('#transactionsList').append(respuesta.respuesta);
 		}
 	}, 'json');
 }
 
 function receiveStock(e){
-	notificacionError(":D");
+	pluginQR.options.flipHorizontal = true;
+	$("#scanned-QR").text("Scanning ...");
+    $("#grab-img").removeClass("disabled");
+    pluginQR.play();
+    $("#qr").attr("idt",$(e.target).attr("idt"));
+	$('#modalTransactions').modal('hide');
+	
+	$('input#typeModalQR').val(codeReceiveQR);
+	openModal("#qr");
+	e.preventDefault();
 }
 
 function doTransition(e){
-	$('input#typeModalQR').val("TS-QR");
+	pluginQR.options.flipHorizontal = true;
+	$("#scanned-QR").text("Scanning ...");
+    $("#grab-img").removeClass("disabled");
+    pluginQR.play();
+    $("#qr").attr("idt",$(e.target).attr("idt"));
+	$('#modalTransactions').modal('hide');
+	
+	$('input#typeModalQR').val(codeTraspasoQR);
 	openModal("#qr");
 	e.preventDefault();
-	 $("button#play").trigger("click");
+}
+
+function doSendShoe(e){
+	pluginQR.options.flipHorizontal = true;
+	$("#scanned-QR").text("Scanning ...");
+    $("#grab-img").removeClass("disabled");
+    pluginQR.play();
+    $("#qr").attr("idt",$(e.target).attr("idt"));
+	$('#modalTransactions').modal('hide');
+	
+	$('input#typeModalQR').val(codeTraspasoQR);
+	openModal("#qr");
+	e.preventDefault();
 }
 
 function notificacionError(texto){
@@ -452,13 +519,19 @@ function notificacionError(texto){
 
 function notificacionSuccess(texto){
 	var n = noty({
-        text        : "<span class='glyphicon glyphicon-thumbs-down'></span> "+texto,
+        text        : "<span class='glyphicon glyphicon-thumbs-up'></span> "+texto,
         type        : 'alert',
         dismissQueue: true,
         layout      : 'topRight',
         theme       : 'defaultTheme',
         type		: 'success',
-        timeout     : 8000
+        timeout     : 4000,
+        animation: {
+            open: 'animated bounceInRight', 
+            close: 'animated bounceOutRight', 
+            easing: 'swing', 
+            speed: 500 
+        }
     });
 }
 

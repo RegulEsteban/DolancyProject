@@ -36,7 +36,7 @@ if($_POST)
     	if(count($stocks)>0){
     		$result = "";
     		foreach ($stocks as $stock){
-    			$transacciones = $query->select("stockid","transition_shoe_log","stockid = $stock->id","","obj");
+    			$transacciones = $query->select("stockid","transition_shoe_log","stockid = $stock->id","and employeeid_receiber is null","obj");
     			$result=$result.'<tr>
                   		<td>'.$stock->model.'</td>
                   		<td>'.$stock->size.'</td>
@@ -79,17 +79,18 @@ if($_POST)
     					if(count($ventas)==1){
     						foreach ($ventas as $venta){
     							if($query->insert("detail_sale", "saleid,stockid","$venta->saleid,$stockid","") && $query->update("detail_stock", "status = 1","stockid = $stockid")){
-    								$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size",
-    										"detail_stock s
+    								$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, ds.detail_sale_id as id_detail",
+    										"detail_sale ds
+											join detail_stock s on ds.stockid = s.stockid
 											join shoe on s.shoeid = shoe.shoeid
 											join model m on m.modelid = shoe.modelid
 											join sizes z on z.sizesid = shoe.sizesid
 											join color c on c.colorid = shoe.colorid",
-    										"s.stockid = $stockid ","", "obj");
+    										"s.stockid = $stockid ","and ds.saleid = $venta->saleid", "obj");
     									
     								if(count($stocks)==1){
     									foreach ($stocks as $stock){
-    										$miArray = array("error"=>null,"model"=>$stock->model,"color"=>$stock->color,"size"=>$stock->size,"price"=>$stock->price,"saleid"=>$venta->saleid,"stockid"=>$stock->id);
+    										$miArray = array("error"=>null,"model"=>$stock->model,"color"=>$stock->color,"size"=>$stock->size,"price"=>$stock->price,"saleid"=>$venta->saleid,"stockid"=>$stock->id,"id_detail"=>$stock->id_detail);
     										echo json_encode($miArray);
     									}
     								}else{
@@ -111,17 +112,18 @@ if($_POST)
     				}
     			}else{
     				if($query->insert("detail_sale", "saleid,stockid","$saleid,$stockid","") && $query->update("detail_stock", "status = 1","stockid = $stockid")){
-    					$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size",
-    							"detail_stock s
+    					$stocks = $query->select("s.stockid as id, shoe.price as price, m.title as model, c.title as color, z.size as size, ds.detail_sale_id as id_detail",
+    										"detail_sale ds
+											join detail_stock s on ds.stockid = s.stockid
 											join shoe on s.shoeid = shoe.shoeid
 											join model m on m.modelid = shoe.modelid
 											join sizes z on z.sizesid = shoe.sizesid
 											join color c on c.colorid = shoe.colorid",
-    							"s.stockid = $stockid ","", "obj");
+    										"s.stockid = $stockid ","and ds.saleid = $saleid", "obj");
     		
     					if(count($stocks)==1){
     						foreach ($stocks as $stock){
-    							$miArray = array("error"=>null,"model"=>$stock->model,"color"=>$stock->color,"size"=>$stock->size,"price"=>$stock->price,"saleid"=>$saleid,"stockid"=>$stock->id);
+    							$miArray = array("error"=>null,"model"=>$stock->model,"color"=>$stock->color,"size"=>$stock->size,"price"=>$stock->price,"saleid"=>$saleid,"stockid"=>$stock->id,"id_detail"=>$stock->id_detail);
     							echo json_encode($miArray);
     						}
     					}else{
@@ -164,13 +166,14 @@ if($_POST)
     	
     	$query = new Query();
     	if($saleid!=0){
-    		$shoes = $query->select("shoe.price as price, m.title as model, c.title as color, z.size as size, ds.discountid",
+    		$shoes = $query->select("shoe.price as price, m.title as model, c.title as color, z.size as size, cd.discountid, cd.monto",
     							"detail_sale ds
 								join detail_stock s on ds.stockid = s.stockid
 								join shoe on s.shoeid = shoe.shoeid
 								join model m on m.modelid = shoe.modelid
 								join sizes z on z.sizesid = shoe.sizesid
-								join color c on c.colorid = shoe.colorid",
+								join color c on c.colorid = shoe.colorid
+    							left join cash_discount cd on cd.discountid = ds.discountid",
     							"ds.saleid = $saleid","","obj");
     		
     		if(count($shoes)>0){
@@ -183,18 +186,10 @@ if($_POST)
     							<td>$shoe->size</td>
     							<td>$shoe->price</td>";
     				
-    				if($shoe->discountid!=0){
-    					$discount = $query->select("monto, description","cash_discount","discountid = $shoe->discountid","and type=0","obj");
-    					if(count($discount)==1){
-    						foreach ($discount as $d){
-    							$descuento = ($shoe->price)-($d->monto);
-    							$res = $res."<td>".number_format($descuento, 2, '.', '')."</td>";
-    							$total = $total + $descuento;
-    						}
-    					}else{
-    						$miArray = array("error"=>"Demasiados descuento para un solo producto.");
-    						echo json_encode($miArray);
-    					}
+    				if($shoe->discountid!=null){
+    					$descuento = ($shoe->price)-($shoe->monto);
+    					$res = $res."<td>".number_format($descuento, 2, '.', '')."</td>";
+    					$total = $total + $descuento;
     				}else{
     					$res = $res."<td>$shoe->price</td>";
     					$total = $total + $shoe->price;
@@ -218,7 +213,8 @@ if($_POST)
     	$query = new Query();
     	if($detailSaleId!=0){
     		if($query->update("detail_sale","discountid = $discountid", "detail_sale_id = $detailSaleId","")){
-    			$miArray = array("error"=>null);
+    			$montoArr = $query->select("monto","cash_discount","discountid = $discountid","","arr");
+    			$miArray = array("error"=>null, "monto"=>$montoArr[0]);
     			echo json_encode($miArray);
     		}else{
     			$miArray = array("error"=>"No se pudo aplicar el descuento. Favor de solicitar al administrador.");
@@ -354,12 +350,12 @@ if($_POST)
     		echo json_encode($miArray);
     	}
     }else if($_POST["getTransactions"]){
-    	$employeeid = getUsuId();
     	$branchid = getBranchId();
+    	$employeeid = getUsuId();
     	$res = "";
     	
     	$query = new Query();
-    	$transacciones = $query->select("transitionid, t.date_transition_down, employeeid_sender, 
+    	$transaccionesArr = $query->select("transitionid, t.date_transition_down, employeeid_sender, 
     									t.date_transition_up, employeeid_transporter, employeeid_receiber,
     									concat(eo.firstname,' ',eo.lastname,' ',eo.matname) as employee_order, employeeid_order, 
     									concat(bo.name,' ',bo.address) as branch_origin, branch_origin_id,
@@ -374,52 +370,89 @@ if($_POST)
 				join model m on sh.modelid = m.modelid
 				join color c on sh.colorid = c.colorid
 				join sizes sz on sh.sizesid = sz.sizesid",
-				"1=1","","obj");
+				"1","","obj");
     	
-    	if(count($transacciones)>0){
-    		foreach ($transacciones as $t){
-    			$e_transporter = "Sin confirmar";
-    			$e_sender = "Sin confirmar";
-    			if($t->employeeid_transporter!=null){
-    				$e_transporter_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_transporter","","arr");
-    				$e_transporter = $e_transporter_tmp[0];
-    			}
-    			if($t->employeeid_sender!=null){
-    				$e_sender_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_sender","","arr");
-    				$e_sender = $e_sender_tmp[0];
-    			}
-    			if($t->employeeid_receiber!=null){
-    				$e_receiver_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_receiber","","arr");
-    				$e_receiver = $e_receiver_tmp[0];
-    			}
-    			$res=$res."<tr>
-    					<td>".$t->model."</td>
-    					<td>".$t->color."</td>
-    					<td>".$t->size."</td>
-    					<td>".$t->date_transition_down."</td>
-    					<td>".utf8_encode($t->branch_origin)."</td>
-    					<td>".utf8_encode($t->branch_destination)."</td>
-    					<td>".utf8_encode($t->employee_order)."</td>";
+    	if(count($transaccionesArr)>0){
+    		$res = $res.'<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
+    		foreach ((array) $transaccionesArr as $t){
     			
-    			if($t->branch_destination_id == $branchid){
-    				$res = $res."<td>".utf8_encode($e_sender)."</td>
-    					<td>".utf8_encode($e_transporter)."</td>";
+    			$res = $res.'<div class="panel panel-default"><div class="panel-heading" role="tab" id="heading'.$t->transitionid.'">';
+    			$res = $res.'<h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse'.$t->transitionid.'" aria-expanded="true" aria-controls="collapse'.$t->transitionid.'">';
+    			$res = $res.'Collapsible Group Item No:'.$t->transitionid.' </a></h4></div>';
+    			
+    			$res = $res.'<div id="collapse'.$t->transitionid.'" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading'.$t->transitionid.'">';
+    			$res = $res.'<div class="panel-body">
+    					<div class="progress">
+  <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    <span class="sr-only">40% Complete (success)</span>
+  </div>
+</div>
+    					
+    					</div>';
+    			$res = $res.'</div></div>';
+    			
+
+    			
+    			
+    			
+    			
+//     			$e_transporter = "Sin confirmar";
+//     			$e_sender = "Sin confirmar";
+//     			if($t->employeeid_transporter!=null){
+//     				$e_transporter_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_transporter","","arr");
+//     				$e_transporter = utf8_encode($e_transporter_tmp[0]);
+//     			}
+//     			if($t->employeeid_sender!=null){
+//     				$e_sender_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_sender","","arr");
+//     				$e_sender = utf8_encode($e_sender_tmp[0]);
+//     			}
+//     			if($t->employeeid_receiber!=null){
+//     				$e_receiver_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_receiber","","arr");
+//     				$e_receiver = utf8_encode($e_receiver_tmp[0]);
+//     			}
+//     			$res=$res."<tr>
+//     					<td>".$t->model."</td>
+//     					<td>".$t->color."</td>
+//     					<td>".$t->size."</td>
+//     					<td>".$t->date_transition_down."</td>
+//     					<td>".utf8_encode($t->branch_origin)."</td>
+//     					<td>".utf8_encode($t->branch_destination)."</td>
+//     					<td>".utf8_encode($t->employee_order)."</td>";
+    			
+//     			if($t->branch_destination_id == $branchid){
+//     				$res = $res."<td>".$e_sender."</td><td>".$e_transporter."</td>";
     				
-    				if($t->employeeid_receiber != null){
-    					$res = $res."<td>".utf8_encode($e_receiver)."</td>";
-    				}else if($t->employeeid_sender == null || $t->employeeid_transporter == null){
-    					$res = $res."<td></td>";
-    				}else{
-    					$res = $res."<td><a href='#' class='receiveStock' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Recibir</a></td>";
-    				}
-    			}else if($t->branch_origin_id == $branchid){
-    				$res = $res."<td><a href='#' class='doTransition play-qr' idt='$t->transitionid' ide='$employeeid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
-    					<td></td>
-    					<td></td>";
-    			}
-    			
-	    		$res = $res."</tr>";
+//     				if($t->employeeid_receiber != null){
+//     					$res = $res."<td>".$e_receiver."</td>";
+//     				}else if($t->employeeid_sender == null || $t->employeeid_transporter == null){
+//     					$res = $res."<td></td>";
+//     				}else{
+//     					$res = $res."<td><a href='#' class='receiveStock' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Recibir</a></td>";
+//     				}
+    				
+//     			}else if($t->branch_origin_id == $branchid){
+    				
+//     				if($t->employeeid_receiber!=null){
+//     					$res = $res."<td>".$e_sender."</td>
+//     					<td>".$e_transporter."</td>
+//     					<td>".$e_receiver."</td>";
+//     				}else if($t->employeeid_sender != null){
+//     					$res = $res."<td>".$e_sender."</td>
+//     					<td>".$e_transporter."</td>
+//     					<td>Sin confirmar</td>";
+//     				}else if($t->employeeid_sender != null){
+//     					$res = $res."<td>".$e_sender."</td>
+//     					<td><a href='#' class='doTransition' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
+//     					<td></td>";
+//     				}else{
+//     					$res = $res."<td><a href='#' class='doSendShoe' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
+//     					<td></td>
+//     					<td></td>";
+//     				}
+//     			}
+// 	    		$res = $res."</tr>";
     		}
+    		$res = $res.'</div>';
     		$miArray = array("respuesta"=>$res);
     		echo json_encode($miArray);
     	}else{
@@ -458,6 +491,81 @@ if($_POST)
     		echo json_encode($miArray);
     	}
     		
+    }else if($_POST["getShoeProperties"]){
+    	$stockid=$_POST["stockid"];
+    	
+    	$query = new Query();
+    	$shoe = $query->select("shoe.colorid, shoe.modelid, shoe.sizesid",
+    			"detail_stock s join shoe on s.shoeid = shoe.shoeid","s.stockid = $stockid","","arr");
+    	if($shoe==null){
+    		$miArray = array("error"=>"El producto no existe.");
+    		echo json_encode($miArray);
+    	}else{
+    		$miArray = array("error"=>null, "colorid"=>$shoe[0], "modelid"=>$shoe[1], "sizesid"=>$shoe[2]);
+    		echo json_encode($miArray);
+    	}
+    }else if($_POST["sendShoe"]){
+    	$transactionid = $_POST["transactionid"];
+    	$employeeid_sender = $_POST["employeeid_sender"];
+    	$branchid = getBranchId();
+    	
+    	$query = new Query();
+    	$em = $query->select("employeeid","employee","employeeid = $employeeid_sender","and branchid = $branchid","arr");
+    	$tr = $query->select("transitionid","transition_shoe_log","transitionid = $transactionid","","arr");
+    	if($em!=null && $tr!=null){
+    		if($query->update("transition_shoe_log", "employeeid_sender = $employeeid_sender", "transitionid = $transactionid", "")){
+    			$miArray = array("error"=>null);
+    			echo json_encode($miArray);
+    		}else{
+    			$miArray = array("error"=>"La transacción no ha podido ser modificada.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"Los datos no son correctos, verifique sus datos.");
+    		echo json_encode($miArray);
+    	}
+    	
+    }else if($_POST["trasportShoe"]){
+    	$transactionid = $_POST["transactionid"];
+    	$employeeid_sender = $_POST["employeeid_sender"];
+    	
+    	$query = new Query();
+    	$em = $query->select("employeeid","employee","employeeid = $employeeid_sender","","arr");
+    	$tr = $query->select("transitionid","transition_shoe_log","transitionid = $transactionid","","arr");
+    	if($em!=null && $tr!=null){
+    		if($query->update("transition_shoe_log", "employeeid_transporter = $employeeid_sender", "transitionid = $transactionid", "")){
+    			$miArray = array("error"=>null);
+    			echo json_encode($miArray);
+    		}else{
+    			$miArray = array("error"=>"La transacción no ha podido ser modificada.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"La transacción o el empleado no existen.");
+    		echo json_encode($miArray);
+    	}
+    	
+    }else if($_POST["receiveShoe"]){
+    	$transactionid = $_POST["transactionid"];
+    	$employeeid_sender = $_POST["employeeid_sender"];
+    	
+    	$query = new Query();
+    	$em = $query->select("employeeid","employee","employeeid = $employeeid_sender","","arr");
+    	$tr = $query->select("transitionid, branch_destination_id, stockid","transition_shoe_log","transitionid = $transactionid","","arr");
+    	if($em!=null && $tr!=null){
+    		if($query->update("transition_shoe_log", "employeeid_receiber = $employeeid_sender", "transitionid = $transactionid", "") &&
+    				$query->update("detail_stock", "branchid = $tr[1], date_stock_up = NOW()","stockid = $tr[2]","")){
+    			$miArray = array("error"=>null);
+    			echo json_encode($miArray);
+    		}else{
+    			$miArray = array("error"=>"La transacción no ha podido ser modificada.");
+    			echo json_encode($miArray);
+    		}
+    	}else{
+    		$miArray = array("error"=>"La transacción o el empleado no existen.");
+    		echo json_encode($miArray);
+    	}
+    	
     }
     
 }else if($_GET){

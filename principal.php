@@ -95,9 +95,25 @@ if(!isLogin()){
 	    					<?php 
 	    					if(existSaleList(getUsuId())==0){
 	    						echo "<div id='noResultSaleList' class='alert alizarin' role='alert'>Aún no hay listas de venta por mostrar.</div>"; 
-	    					}else{
-	    						getSaleList(getUsuId());
-							}?>
+	    					}?>
+	    					<table id="idTableSaleList" saleid="<?php echo existSaleList(getUsuId()) ?>" class="table table-striped">
+		                    	<thead>
+		                        	<tr>
+		                            	<th>Modelo</th>
+		                            	<th>Talla</th>
+		                            	<th>Color</th>
+		                            	<th>Precio</th>
+		                            	<th>Adicional</th>
+		                            	<th>Acción</th>
+		                        	</tr>
+		                    	</thead>
+		        				<tbody>
+		        					<?php 
+			    					if(existSaleList(getUsuId())!=0){
+			    						getSaleList(getUsuId());
+									}?>
+    							</tbody>
+	        				</table>
 	    				</div>
 	  				</div>
 	  			</div>
@@ -300,25 +316,25 @@ if(!isLogin()){
         			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         			<h4 class="modal-title">Transacciones</h4>
       			</div>
-      			<div class="modal-body">
-					<table id="transactionsList" class="table table-striped">
-	                    <thead>
-	                        <tr>
-	                        	<th>Modelo</th>
-	                        	<th>Color</th>
-	                        	<th>Talla</th>
-	                        	<th>Fecha de salida</th>
-	                        	<th>Sucursal de Origen</th>
-	                            <th>Sucursal de Destino</th>
-	                            <th>Petición</th>
-	                            <th>Envió</th>
-	                            <th>Transportador</th>
-	                            <th>Recibió</th>
-	                        </tr>
-	                    </thead>
-	                    <tbody>
-	                    </tbody>
-	            	</table>			            	
+      			<div class="modal-body" id="transactionsList">
+<!-- 					<table id="transactionsList" class="table table-striped"> -->
+<!-- 	                    <thead> -->
+<!-- 	                        <tr> -->
+<!-- 	                        	<th>Modelo</th> -->
+<!-- 	                        	<th>Color</th> -->
+<!-- 	                        	<th>Talla</th> -->
+<!-- 	                        	<th>Fecha de salida</th> -->
+<!-- 	                        	<th>Sucursal de Origen</th> -->
+<!-- 	                            <th>Sucursal de Destino</th> -->
+<!-- 	                            <th>Petición</th> -->
+<!-- 	                            <th>Envió</th> -->
+<!-- 	                            <th>Transportador</th> -->
+<!-- 	                            <th>Recibió</th> -->
+<!-- 	                        </tr> -->
+<!-- 	                    </thead> -->
+<!-- 	                    <tbody> -->
+<!-- 	                    </tbody> -->
+<!-- 	            	</table>			            	 -->
       			</div>
       			<div class="modal-footer">
         			<button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>

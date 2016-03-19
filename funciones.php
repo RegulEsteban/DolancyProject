@@ -1,5 +1,6 @@
 <?php
 include_once './conf/query.inc';
+include_once './conf/DateTimeCustom.php';
 #Limpia los datos
 function __($var)
 {
@@ -179,17 +180,35 @@ function getEmployeesList(){
 
 function getDiscounts($type){
 	$query=new Query();
-	$values = $query->select("discountid, monto, description","cash_discount","type = $type","","obj");
+	$values = $query->select("discountid, monto, description, date_expiration","cash_discount","type = $type","","obj");
 	if(count($values)>0){
 		echo "<select id='discount_select' name='discount_select' class='form-control'>";
 		echo "<option value='0' monto='0' selected>Seleccione un descuento</option>";
 		foreach ($values as $d){
-			echo "<option value='".$d->discountid."' monto='".$d->monto."'>".$d->description."</option>";
+			$dateLast = date('Y-m-d', strtotime($d->date_expiration));
+			$now = date("Y-m-d");
+			
+			if(diff($dateLast, $now)==0){
+				$query->remove("cash_discount", "discountid = $d->discountid");
+			}else{
+				echo "<option value='".$d->discountid."' monto='".$d->monto."'>".utf8_encode($d->description)."</option>";
+			}
 		}
 		echo "</select>";
 	}else{
 		echo "<div class='alert alizarin' role='alert'>No hay descuentos disponibles.</div>";
 	}
+}
+
+function diff($date1, $date2) {
+	if(strtotime($date1)<strtotime($date2)){
+		return 0;
+	}
+	$diff = abs(strtotime($date2) - strtotime($date1));
+	$years = floor($diff / (365*60*60*24));
+	$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+	$days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24) / (60*60*24));
+	return $days;
 }
 
 function getEmployee($employeeid){
@@ -235,39 +254,29 @@ function getSaleList($employeeid){
 	$ventas = $query->select("saleid, employeeid, client_opid, total", "sale", "employeeid = $employeeid", "and status=0", "obj");
 	if(count($ventas)==1){
 		foreach ($ventas as $venta){
-			$stocks = $query->select("shoe.price, m.title as model, c.title as color, z.size as size, s.stockid as id, ds.detail_sale_id ",
+			$stocks = $query->select("shoe.price, m.title as model, c.title as color, z.size as size, s.stockid as id, ds.detail_sale_id, cd.discountid, cd.monto ",
 									"detail_sale ds
 									join detail_stock s on ds.stockid = s.stockid
 									join shoe on s.shoeid = shoe.shoeid
 									join model m on m.modelid = shoe.modelid
 									join sizes z on z.sizesid = shoe.sizesid
-									join color c on c.colorid = shoe.colorid",
+									join color c on c.colorid = shoe.colorid
+									left join cash_discount cd on cd.discountid = ds.discountid",
 									"ds.saleid = $venta->saleid ", "", "obj");
 			if(count($stocks)>0){
-				echo '<table id="idTableSaleList" saleid="'.$venta->saleid.'" class="table table-striped">
-		                    	<thead>
-		                        	<tr>
-		                            	<th>Modelo</th>
-		                            	<th>Talla</th>
-		                            	<th>Color</th>
-		                            	<th>Precio</th>
-		                            	<th>Acción</th>
-		                            	<th>Adicional</th>
-		                        	</tr>
-		                    	</thead>
-		        				<tbody>';
 				foreach ($stocks as $stock){
 					echo '<tr>
                   			<td>'.$stock->model.'</td>
                   			<td>'.$stock->size.'</td>
                   			<td>'.$stock->color.'</td>
-                  			<td>'.$stock->price.'</td>
-                  			<td><a href="#" class="removeShoeSaleList" stockid='.$stock->id.'><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td>
-                  			<td><a href="#" class="applyDiscount" stockidApply='.$stock->detail_sale_id.' monto='.$stock->price.'><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>
-						</tr>';
+                  			<td>'.$stock->price.'</td>';
+                  	if($stock->discountid!=null){
+                  		echo '<td><a href="#" class="applyDiscount" stockidApply='.$stock->detail_sale_id.' monto='.$stock->price.'><span class="glyphicon glyphicon-heart"></span> '.number_format($stock->price-$stock->monto, 2, '.', ',').'</a></td>';
+                  	}else{
+                  		echo '<td><a href="#" class="applyDiscount" stockidApply='.$stock->detail_sale_id.' monto='.$stock->price.'><span class="glyphicon glyphicon-heart-empty"></span> Adicional</a></td>';
+                  	}
+					echo '<td><a href="#" class="removeShoeSaleList" stockid='.$stock->id.'><span class="glyphicon glyphicon-remove"></span> Eliminar</a></td></tr>';
 				}
-				echo '</tbody>
-	        				</table>';
 			}else{
 				echo "<div id='noResultSaleList' class='alert alizarin' role='alert'>Aún no hay listas de venta por mostrar.</div>";
 			}
@@ -286,7 +295,7 @@ function getShoes($branchid){
 			join sizes z on z.sizesid = shoe.sizesid
 			join color c on c.colorid = shoe.colorid
 			join branch b on b.branchid = s.branchid",
-			"b.branchid = $branchid and s.status = 0 or s.status = 1 or s.status = 3 order by s.status","", "obj");
+			"b.branchid = $branchid and (s.status = 0 or s.status = 1 or s.status = 3) order by s.status","", "obj");
 	 
 	if(count($stocks)>0){
 		echo "<table id='tableShoes' class='table table-striped'><thead><tr>
@@ -299,7 +308,7 @@ function getShoes($branchid){
 				<th>Acción</th>
 				</tr></thead><tbody>";
 		foreach ($stocks as $stock){
-			$transacciones = $query->select("stockid","transition_shoe_log","stockid = $stock->id","","obj");
+			$transacciones = $query->select("stockid","transition_shoe_log","stockid = $stock->id","and employeeid_receiber is null","obj");
 			echo '<tr>
                   	<td>'.$stock->model.'</td>
                   	<td>'.$stock->size.'</td>

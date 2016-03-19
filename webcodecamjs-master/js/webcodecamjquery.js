@@ -240,7 +240,7 @@
             if (localImage || (!delayBool && !video.paused)) {
                 sucessLocalDecode = true;
                 delayBool = true;
-                delay();
+                //delay(); //************* aquí esta el delay ****************//
                 setTimeout(function() {
                     if (Self.options.codeRepetition || lastCode != a) {
                         beep();
@@ -574,6 +574,16 @@
         },
         isInitialized: function() {
             return initialized;
+        },
+        destroy: function() {
+            stop();
+            $(video).off();
+            sucessLocalDecode = false,
+            localImage = false,
+            isStreaming = false,
+            delayBool = false,
+            initialized = false,
+            localStream = null;
         }
     });
     $.fn[pluginName] = function(options) {
