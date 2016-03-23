@@ -370,105 +370,146 @@ if($_POST)
 				join model m on sh.modelid = m.modelid
 				join color c on sh.colorid = c.colorid
 				join sizes sz on sh.sizesid = sz.sizesid",
-				"1","","obj");
+				"branch_origin_id = $branchid or branch_destination_id = $branchid",
+    			"order by t.date_transition_down desc","obj");
     	
     	if(count($transaccionesArr)>0){
     		$res = $res.'<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
     		foreach ((array) $transaccionesArr as $t){
     			
+    			$e_transporter = "Sin confirmar";
+    			$e_sender = "Sin confirmar";
+    			$e_receiver = "Sin confirmar";
+    			if($t->employeeid_transporter!=null){
+    				$e_transporter_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_transporter","","arr");
+    				$e_transporter = utf8_encode($e_transporter_tmp[0]);
+    			}
+    			if($t->employeeid_sender!=null){
+    				$e_sender_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_sender","","arr");
+    				$e_sender = utf8_encode($e_sender_tmp[0]);
+    			}
+    			if($t->employeeid_receiber!=null){
+    				$e_receiver_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_receiber","","arr");
+    				$e_receiver = utf8_encode($e_receiver_tmp[0]);
+    			}
+    			
     			$res = $res.'<div class="panel panel-default"><div class="panel-heading" role="tab" id="heading'.$t->transitionid.'">';
     			$res = $res.'<h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse'.$t->transitionid.'" aria-expanded="true" aria-controls="collapse'.$t->transitionid.'">';
-    			$res = $res.'Collapsible Group Item No:'.$t->transitionid.' </a></h4></div>';
     			
-    			$res = $res.'<div id="collapse'.$t->transitionid.'" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading'.$t->transitionid.'">';
+    			$res = $res.'Transacción No: <span class="label label-primary">'.$t->transitionid.'</span>&nbsp;&nbsp;&nbsp;&nbsp;Producto [<b>Modelo:</b> '.$t->model.' <b>Color:</b> '.$t->color.' <b>Talla:</b> '.$t->size.']';
+    			
+    			$res = $res.'</a></h4></div>';
+    			
+    			$res = $res.'<div id="collapse'.$t->transitionid.'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading'.$t->transitionid.'">';
     			$res = $res.'<div class="panel-body">
     					<div class="col-md-12">
-    						<div class="col-md-2">
-    							<div class="media"><i class="icon-home icon-md"></i>
+    						<div class="col-md-2" id="servicesIcon">
+    							<div class="media services"><div class="pull-left"><i class="icon-home icon-smd"></i></div>
     								<div class="media-body">
-    									<h4 class="media-heading">'.utf8_encode($t->branch_origin).'</h4>
+    									'.utf8_encode($t->branch_origin).'
     								</div>
     							</div>
     						</div>
     						<div class="col-md-8">
-    							<div class="progress">
-  <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-    <span class="sr-only">40% Complete (success)</span>
-  </div>
-</div>
+    							<div class="progress">';
+    								if($t->employeeid_receiber != null){
+    									$res = $res.
+    									'<div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+    										<span class="sr-only">100% Complete (success)</span>
+  										</div>';
+    								}else if($t->employeeid_transporter != null){
+    									$res = $res.
+    									'<div class="progress-bar progress-bar-primary progress-bar-striped active" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%">
+    										<span class="sr-only">80% Complete (success)</span>
+  										</div>';
+    								}else if($t->employeeid_sender != null){
+    									$res = $res.
+    									'<div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+    										<span class="sr-only">50% Complete (success)</span>
+  										</div>';
+    								}else{
+    									$res = $res.
+    									'<div class="progress-bar progress-bar-danger progress-bar-striped active" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+    										<span class="sr-only">20% Complete (success)</span>
+  										</div>';
+    								}
+    									
+								$res = $res.
+								'</div>
+    							<div class="pull-center">
+    								<table class="table">
+    									<tbody>
+    										<tr>
+    											<td><ul class="list-inline"><li>Producto [<b>Modelo: </b>'.$t->model.' <b>Color: </b>'.$t->color.' <b>Talla: </b>'.$t->size.']</li></ul></td>
+    											<td><ul class="list-inline"><li><b>Fecha: </b>'.$t->date_transition_down.'</td>
+    										</tr>
+    									</tbody>
+									</table>
+    							</div>
     						</div>
-    						<div class="col-md-2">
-    							<div class="media"><i class="icon-home icon-md"></i>
+    						<div class="col-md-2" id="servicesIcon">
+    							<div class="media services"><div class="pull-right"><i class="icon-home icon-smd"></i></div>
     								<div class="media-body">
-    									<h4 class="media-heading">'.utf8_encode($t->branch_destination).'</h4>
+    									'.utf8_encode($t->branch_destination).'
     								</div>
     							</div>
     						</div>
     					</div>
     					
-    					
-    					</div>';
-    			$res = $res.'</div></div>';
-
+						<div class="col-md-12">
+							<table class="table">
+    							<thead>
+    								<tr>
+    									<th>Petición</th>
+    									<th>Envío</th>
+    									<th>Transporte</th>
+    									<th>Recibo</th>
+    								</tr>
+    							</thead>
+    							<tbody>
+    								<tr>
+    									<td><p><span class="glyphicon glyphicon-user"></span> '.utf8_encode($t->employee_order).'</p></td>';
+		    			
+		    			if($t->branch_destination_id == $branchid){
+		    				
+		    				if($t->employeeid_receiber == null && $t->employeeid_transporter != null){
+		    					$res = $res.
+		    					'<td><p><span class="glyphicon glyphicon-user"></span> '.$e_sender.'</p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_transporter.'</p></td>
+	    						<td><p><a href="#" class="receiveStock" idt="'.$t->transitionid.'"><span class="glyphicon glyphicon-download"></span> Recibir</a></p></td>';
+		    				}else{
+		    					$res = $res.
+		    					'<td><p><span class="glyphicon glyphicon-user"></span> '.$e_sender.'</p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_transporter.'</p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_receiver.'</p></td>';
+		    				}
+		    				
+		    			}else if($t->branch_origin_id == $branchid){
+		    				if($t->employeeid_sender == null){
+				    			$res = $res.
+				    			'<td><p><a href="#" class="doSendShoe" idt="'.$t->transitionid.'"><span class="glyphicon glyphicon-download"></span> Transportar</a></p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_transporter.'</p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_receiver.'</p></td>';
+		    				}else if($t->employeeid_transporter == null){
+		    					$res = $res.
+		    					'<td><p><span class="glyphicon glyphicon-user"></span> '.$e_sender.'</p></td>
+	    						<td><p><a href="#" class="doTransition" idt="'.$t->transitionid.'"><span class="glyphicon glyphicon-download"></span> Transportar</a></p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_receiver.'</p></td>';
+		    				}else{
+		    					$res = $res.
+		    					'<td><p><span class="glyphicon glyphicon-user"></span> '.$e_sender.'</p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_transporter.'</p></td>
+	    						<td><p><span class="glyphicon glyphicon-user"></span> '.$e_receiver.'</p></td>';
+		    				}
+		    			}
     			
+    				$res = $res.'</tr></tbody></table></div>';
     			
-//     			$e_transporter = "Sin confirmar";
-//     			$e_sender = "Sin confirmar";
-//     			if($t->employeeid_transporter!=null){
-//     				$e_transporter_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_transporter","","arr");
-//     				$e_transporter = utf8_encode($e_transporter_tmp[0]);
-//     			}
-//     			if($t->employeeid_sender!=null){
-//     				$e_sender_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_sender","","arr");
-//     				$e_sender = utf8_encode($e_sender_tmp[0]);
-//     			}
-//     			if($t->employeeid_receiber!=null){
-//     				$e_receiver_tmp = $query->select("concat(firstname,' ',lastname,' ',matname)","employee","employeeid = $t->employeeid_receiber","","arr");
-//     				$e_receiver = utf8_encode($e_receiver_tmp[0]);
-//     			}
-//     			$res=$res."<tr>
-//     					<td>".$t->model."</td>
-//     					<td>".$t->color."</td>
-//     					<td>".$t->size."</td>
-//     					<td>".$t->date_transition_down."</td>
-//     					<td>".utf8_encode($t->branch_origin)."</td>
-//     					<td>".utf8_encode($t->branch_destination)."</td>
-//     					<td>".utf8_encode($t->employee_order)."</td>";
+    			$res = $res.'</div></div></div>';
     			
-//     			if($t->branch_destination_id == $branchid){
-//     				$res = $res."<td>".$e_sender."</td><td>".$e_transporter."</td>";
-    				
-//     				if($t->employeeid_receiber != null){
-//     					$res = $res."<td>".$e_receiver."</td>";
-//     				}else if($t->employeeid_sender == null || $t->employeeid_transporter == null){
-//     					$res = $res."<td></td>";
-//     				}else{
-//     					$res = $res."<td><a href='#' class='receiveStock' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Recibir</a></td>";
-//     				}
-    				
-//     			}else if($t->branch_origin_id == $branchid){
-    				
-//     				if($t->employeeid_receiber!=null){
-//     					$res = $res."<td>".$e_sender."</td>
-//     					<td>".$e_transporter."</td>
-//     					<td>".$e_receiver."</td>";
-//     				}else if($t->employeeid_sender != null){
-//     					$res = $res."<td>".$e_sender."</td>
-//     					<td>".$e_transporter."</td>
-//     					<td>Sin confirmar</td>";
-//     				}else if($t->employeeid_sender != null){
-//     					$res = $res."<td>".$e_sender."</td>
-//     					<td><a href='#' class='doTransition' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
-//     					<td></td>";
-//     				}else{
-//     					$res = $res."<td><a href='#' class='doSendShoe' idt='$t->transitionid'><span class='glyphicon glyphicon-download'></span> Transportar</a></td>
-//     					<td></td>
-//     					<td></td>";
-//     				}
-//     			}
-// 	    		$res = $res."</tr>";
     		}
     		$res = $res.'</div>';
+    		
     		$miArray = array("respuesta"=>$res);
     		echo json_encode($miArray);
     	}else{
