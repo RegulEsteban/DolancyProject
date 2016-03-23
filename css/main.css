@@ -635,15 +635,15 @@ body > section {
 .img-thumbnail {
   border: 0;
 }
-.progress,
-.progress .bar {
-  background: #fff;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  height: 30px;
-  line-height: 30px;
-}
+/* .progress, */
+/* .progress .bar { */
+/*   background: #fff; */
+/*   -webkit-box-shadow: none; */
+/*   -moz-box-shadow: none; */
+/*   box-shadow: none; */
+/*   height: 30px; */
+/*   line-height: 30px; */
+/* } */
 .well {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;

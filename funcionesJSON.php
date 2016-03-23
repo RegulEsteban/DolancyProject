@@ -382,18 +382,34 @@ if($_POST)
     			
     			$res = $res.'<div id="collapse'.$t->transitionid.'" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading'.$t->transitionid.'">';
     			$res = $res.'<div class="panel-body">
-    					<div class="progress">
-  <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    					<div class="col-md-12">
+    						<div class="col-md-2">
+    							<div class="media"><i class="icon-home icon-md"></i>
+    								<div class="media-body">
+    									<h4 class="media-heading">'.utf8_encode($t->branch_origin).'</h4>
+    								</div>
+    							</div>
+    						</div>
+    						<div class="col-md-8">
+    							<div class="progress">
+  <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
     <span class="sr-only">40% Complete (success)</span>
   </div>
 </div>
+    						</div>
+    						<div class="col-md-2">
+    							<div class="media"><i class="icon-home icon-md"></i>
+    								<div class="media-body">
+    									<h4 class="media-heading">'.utf8_encode($t->branch_destination).'</h4>
+    								</div>
+    							</div>
+    						</div>
+    					</div>
+    					
     					
     					</div>';
     			$res = $res.'</div></div>';
-    			
 
-    			
-    			
     			
     			
 //     			$e_transporter = "Sin confirmar";

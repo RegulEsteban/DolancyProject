@@ -453,7 +453,7 @@ function orderImport(e){
 }
 
 function transactionsButton(e){
-	$("#transactionsList tbody").empty();
+	$("#transactionsList").empty();
 	
 	$.post("funcionesJSON.php", {getTransactions: true}, function(respuesta){
 		if(respuesta.error != null){

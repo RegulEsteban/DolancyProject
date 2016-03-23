@@ -8,7 +8,7 @@
 <meta name="Distribution" content="Global" />
 <meta name="Rating" content="General"/>
 
-<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap.css" rel="stylesheet">
 <link href="css/font-awesome.min.css" rel="stylesheet">
 <link href="css/prettyPhoto.css" rel="stylesheet">
 <link href="css/animate.css" rel="stylesheet">
