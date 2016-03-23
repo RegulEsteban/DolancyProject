@@ -1,0 +1,345 @@
+-- phpMyAdmin SQL Dump
+-- version 2.10.3
+-- http://www.phpmyadmin.net
+-- 
+-- Servidor: localhost
+-- Tiempo de generación: 22-03-2016 a las 20:11:23
+-- Versión del servidor: 5.0.51
+-- Versión de PHP: 5.2.6
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+-- 
+-- Base de datos: `zapateria_dolancy`
+-- 
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `branch`
+-- 
+
+CREATE TABLE `branch` (
+  `branchid` int(11) NOT NULL auto_increment,
+  `name` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `address` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `status` int(1) NOT NULL default '1',
+  PRIMARY KEY  (`branchid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+
+-- 
+-- Volcar la base de datos para la tabla `branch`
+-- 
+
+INSERT INTO `branch` VALUES (1, 'Procas', 'Av. Independencia S/N', 1);
+INSERT INTO `branch` VALUES (2, 'Procasma 2000', 'Av. Independencia #001 Bo. San Pedro', 1);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `cash_discount`
+-- 
+
+CREATE TABLE `cash_discount` (
+  `discountid` int(11) NOT NULL auto_increment,
+  `porcentage` int(11) default NULL,
+  `monto` decimal(9,2) default NULL,
+  `description` varchar(200) collate utf8_unicode_ci default NULL,
+  `date_expiration` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `type` int(11) NOT NULL,
+  `acumulated` int(11) default '0',
+  PRIMARY KEY  (`discountid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+
+-- 
+-- Volcar la base de datos para la tabla `cash_discount`
+-- 
+
+INSERT INTO `cash_discount` VALUES (2, NULL, 52.00, 'Cliente Frecuente', '2016-03-26 16:40:39', 0, 0);
+INSERT INTO `cash_discount` VALUES (1, NULL, 33.00, 'Por cortesía', '2016-03-31 16:40:13', 0, 0);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `client`
+-- 
+
+CREATE TABLE `client` (
+  `clientid` int(11) NOT NULL auto_increment,
+  `firstname` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `lastname` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `matname` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `email` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `phone` varchar(10) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`clientid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=6 ;
+
+-- 
+-- Volcar la base de datos para la tabla `client`
+-- 
+
+INSERT INTO `client` VALUES (1, 'Esteban', 'R', 'P', 'ismael@gmail.com', '1234567890');
+INSERT INTO `client` VALUES (2, 'Hola', 'Hola', 'Hola', 'hola@hola.com', '1234567890');
+INSERT INTO `client` VALUES (3, 'ho', 'la', '11', 'e@e.e', '1');
+INSERT INTO `client` VALUES (4, 'Nuevo', 'Cliente', 'Hola', 'dd@dd.co', '1234567890');
+INSERT INTO `client` VALUES (5, 'ww', 'www', 'ww', 'ww@ww.w', '1234567890');
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `color`
+-- 
+
+CREATE TABLE `color` (
+  `colorid` int(11) NOT NULL auto_increment,
+  `title` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `view_type` int(11) default '0',
+  PRIMARY KEY  (`colorid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+-- 
+-- Volcar la base de datos para la tabla `color`
+-- 
+
+INSERT INTO `color` VALUES (1, 'Negro', 1);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `detail_sale`
+-- 
+
+CREATE TABLE `detail_sale` (
+  `detail_sale_id` int(11) NOT NULL auto_increment,
+  `saleid` int(11) NOT NULL,
+  `stockid` int(11) NOT NULL,
+  `discountid` int(11) default NULL,
+  PRIMARY KEY  (`detail_sale_id`),
+  KEY `saleid` (`saleid`),
+  KEY `stockid` (`stockid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=101 ;
+
+-- 
+-- Volcar la base de datos para la tabla `detail_sale`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `detail_stock`
+-- 
+
+CREATE TABLE `detail_stock` (
+  `stockid` int(11) NOT NULL auto_increment,
+  `branchid` int(11) NOT NULL,
+  `shoeid` int(11) NOT NULL,
+  `date_stock_up` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `date_stock_down` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `status` int(1) NOT NULL default '0',
+  PRIMARY KEY  (`stockid`),
+  KEY `branchid` (`branchid`),
+  KEY `shoeid` (`shoeid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+
+-- 
+-- Volcar la base de datos para la tabla `detail_stock`
+-- 
+
+INSERT INTO `detail_stock` VALUES (1, 1, 1, '2016-03-17 19:51:04', '0000-00-00 00:00:00', 0);
+INSERT INTO `detail_stock` VALUES (2, 1, 1, '2016-03-17 19:51:03', '0000-00-00 00:00:00', 0);
+INSERT INTO `detail_stock` VALUES (3, 1, 1, '2016-03-17 19:35:01', '0000-00-00 00:00:00', 0);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `employee`
+-- 
+
+CREATE TABLE `employee` (
+  `employeeid` int(11) NOT NULL auto_increment,
+  `firstname` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `lastname` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `matname` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `email` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `phone` varchar(10) collate utf8_unicode_ci NOT NULL,
+  `address` varchar(200) collate utf8_unicode_ci NOT NULL,
+  `type_employee` int(11) default '0',
+  `branchid` int(9) NOT NULL,
+  `status` int(1) NOT NULL default '1',
+  PRIMARY KEY  (`employeeid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+
+-- 
+-- Volcar la base de datos para la tabla `employee`
+-- 
+
+INSERT INTO `employee` VALUES (1, 'Esteban I', 'Regules', 'Pérez', 'regulesteban@gmail.com', '7224631462', 'Av. 5 de Mayo', 0, 1, 1);
+INSERT INTO `employee` VALUES (3, 'Dul', 'Seg', 'Algo', 'd@dd.com', '0987654321', 'av 5 m', 1, 2, 1);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `model`
+-- 
+
+CREATE TABLE `model` (
+  `modelid` int(11) NOT NULL auto_increment,
+  `title` varchar(9) collate utf8_unicode_ci NOT NULL,
+  `view_type` int(11) default '0',
+  PRIMARY KEY  (`modelid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+-- 
+-- Volcar la base de datos para la tabla `model`
+-- 
+
+INSERT INTO `model` VALUES (1, '097-B', 1);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `order_shoe`
+-- 
+
+CREATE TABLE `order_shoe` (
+  `orderid` int(11) NOT NULL auto_increment,
+  `date_order` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `date_delivery` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `status` int(11) NOT NULL,
+  `description` varchar(500) collate utf8_unicode_ci NOT NULL,
+  `clientid` int(11) NOT NULL,
+  `shoeid` int(11) NOT NULL,
+  `employeeid` int(11) NOT NULL,
+  PRIMARY KEY  (`orderid`),
+  KEY `shoeid` (`shoeid`),
+  KEY `clientid` (`clientid`),
+  KEY `employeeid` (`employeeid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- 
+-- Volcar la base de datos para la tabla `order_shoe`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `sale`
+-- 
+
+CREATE TABLE `sale` (
+  `saleid` int(11) NOT NULL auto_increment,
+  `date_sale` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `employeeid` int(11) NOT NULL,
+  `client_opid` int(11) default NULL,
+  `discountid` int(11) default NULL,
+  `status` int(11) NOT NULL default '0',
+  `total` decimal(9,2) NOT NULL,
+  PRIMARY KEY  (`saleid`),
+  KEY `employeeid` (`employeeid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=24 ;
+
+-- 
+-- Volcar la base de datos para la tabla `sale`
+-- 
+
+INSERT INTO `sale` VALUES (23, '2016-03-17 19:08:46', 1, 1, NULL, 0, 0.00);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `shoe`
+-- 
+
+CREATE TABLE `shoe` (
+  `shoeid` int(11) NOT NULL auto_increment,
+  `price` decimal(5,2) NOT NULL,
+  `counter_type` int(11) default '0',
+  `colorid` int(11) NOT NULL,
+  `sizesid` int(11) NOT NULL,
+  `modelid` int(11) NOT NULL,
+  PRIMARY KEY  (`shoeid`),
+  KEY `colorid` (`colorid`),
+  KEY `sizesid` (`sizesid`),
+  KEY `modelid` (`modelid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+-- 
+-- Volcar la base de datos para la tabla `shoe`
+-- 
+
+INSERT INTO `shoe` VALUES (1, 854.00, 1, 1, 1, 1);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `sizes`
+-- 
+
+CREATE TABLE `sizes` (
+  `sizesid` int(11) NOT NULL auto_increment,
+  `size` decimal(3,1) NOT NULL,
+  PRIMARY KEY  (`sizesid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+-- 
+-- Volcar la base de datos para la tabla `sizes`
+-- 
+
+INSERT INTO `sizes` VALUES (1, 25.0);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `transition_shoe_log`
+-- 
+
+CREATE TABLE `transition_shoe_log` (
+  `transitionid` int(11) NOT NULL auto_increment,
+  `branch_destination_id` int(11) NOT NULL,
+  `branch_origin_id` int(11) NOT NULL,
+  `stockid` int(11) NOT NULL,
+  `date_transition_up` timestamp NULL default NULL on update CURRENT_TIMESTAMP,
+  `date_transition_down` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `employeeid_order` int(11) NOT NULL,
+  `employeeid_sender` int(11) default NULL,
+  `employeeid_transporter` int(11) default NULL,
+  `employeeid_receiber` int(11) default NULL,
+  PRIMARY KEY  (`transitionid`),
+  KEY `stockid` (`stockid`),
+  KEY `employeeid` (`employeeid_sender`),
+  KEY `branch_destination_id` (`branch_destination_id`),
+  KEY `employeeid_receiber` (`employeeid_receiber`),
+  KEY `branch_origin_id` (`branch_origin_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=12 ;
+
+-- 
+-- Volcar la base de datos para la tabla `transition_shoe_log`
+-- 
+
+INSERT INTO `transition_shoe_log` VALUES (9, 2, 1, 1, NULL, '2016-03-17 19:51:15', 3, NULL, NULL, NULL);
+INSERT INTO `transition_shoe_log` VALUES (8, 1, 2, 3, '2016-03-17 19:35:01', '2016-03-17 17:13:37', 1, 3, 3, 1);
+INSERT INTO `transition_shoe_log` VALUES (10, 2, 1, 2, NULL, '2016-03-17 19:51:17', 3, NULL, NULL, NULL);
+INSERT INTO `transition_shoe_log` VALUES (11, 2, 1, 3, NULL, '2016-03-17 19:51:19', 3, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+-- 
+-- Estructura de tabla para la tabla `user_credentials`
+-- 
+
+CREATE TABLE `user_credentials` (
+  `email` varchar(40) collate utf8_unicode_ci NOT NULL,
+  `password` varchar(40) collate utf8_unicode_ci NOT NULL,
+  `status` int(1) NOT NULL default '0',
+  `employeeid` int(11) NOT NULL,
+  KEY `employeeid` (`employeeid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 
+-- Volcar la base de datos para la tabla `user_credentials`
+-- 
+
+INSERT INTO `user_credentials` VALUES ('5cad3c70b2714edb03ef6c6f01b2f587dbdef3e5', '4d839c37d1e9a389fbf227a3871962bad6598de4', 0, 1);
+INSERT INTO `user_credentials` VALUES ('fef1bed53340feaee04e9e325fe4ad0a3e4bde55', 'bb60a7a554e88289fcc74328aa9b72555853ed67', 0, 3);
